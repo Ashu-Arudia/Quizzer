@@ -1,7 +1,8 @@
 // src/App.jsx
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import LoginPage from './pages/LoginPage';
-import AdminPage from './pages/AdminPage';
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import AdminPage from "./pages/AdminPage";
+import LoginPage from "./pages/LoginPage";
+import StudentPage from "./pages/StudentPage";
 
 function App() {
   return (
@@ -9,6 +10,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/admin" element={<AdminPage />} />
+        <Route path="/student" element={<StudentPage />} />
       </Routes>
     </Router>
   );

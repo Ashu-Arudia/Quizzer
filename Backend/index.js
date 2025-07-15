@@ -1,6 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const authRoutes = require("./routes/auth");
+const mcqRoutes = require("./routes/mcq");
+const userRoutes = require("./routes/user");
 require("dotenv").config();
 const app = express();
 
@@ -20,5 +22,7 @@ app.use(express.json());
 
 //routes
 app.use("/api", authRoutes);
+app.use("/api/mcq", mcqRoutes);
+app.use("/api/", userRoutes);
 
 app.listen(process.env.PORT, () => console.log("Server started!!"));

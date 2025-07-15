@@ -1,11 +1,11 @@
-// src/components/MCQForm.jsx
-import { useState } from 'react';
+import { useState } from "react";
 
 export default function MCQForm() {
-  const [question, setQuestion] = useState('');
-  const [options, setOptions] = useState(['', '', '', '']);
-  const [correctAnswer, setCorrectAnswer] = useState('');
-  const [error, setError] = useState('');
+  const [question, setQuestion] = useState("");
+  const [options, setOptions] = useState(["", "", "", ""]);
+  const [correctAnswer, setCorrectAnswer] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleOptionChange = (index, value) => {
     const updatedOptions = [...options];
@@ -13,44 +13,60 @@ export default function MCQForm() {
     setOptions(updatedOptions);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setSuccess("");
 
-    // ✨ Validation
-    if (!question.trim()) {
-      return setError('Question cannot be empty.');
-    }
-    if (options.some(opt => !opt.trim())) {
-      return setError('All options must be filled.');
-    }
-    if (new Set(options).size !== options.length) {
-      return setError('Options must be unique.');
-    }
-    if (!options.includes(correctAnswer)) {
-      return setError('Correct answer must match one of the options.');
-    }
+    // ✅ Validation
+    if (!question.trim()) return setError("Question cannot be empty.");
+    if (options.some((opt) => !opt.trim()))
+      return setError("All options must be filled.");
+    if (new Set(options).size !== options.length)
+      return setError("Options must be unique.");
+    if (!options.includes(correctAnswer))
+      return setError("Correct answer must match one of the options.");
 
     const mcq = { question, options, correctAnswer };
-    
-    // Save to localStorage
-    const existing = JSON.parse(localStorage.getItem('mcqs')) || [];
-    localStorage.setItem('mcqs', JSON.stringify([...existing, mcq]));
 
-    console.log('MCQ Submitted:', mcq);
-    alert('MCQ Added!');
+    const token = localStorage.getItem("token");
+    if (!token) {
+      return setError("User not authenticated. Please log in again.");
+    }
 
-    // Reset form
-    setQuestion('');
-    setOptions(['', '', '', '']);
-    setCorrectAnswer('');
-    setError('');
+    try {
+      const response = await fetch("http://localhost:8000/api/mcq", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(mcq),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSuccess("MCQ submitted successfully!");
+        // Clear form
+        setQuestion("");
+        setOptions(["", "", "", ""]);
+        setCorrectAnswer("");
+      } else {
+        setError(data.msg || "Failed to submit MCQ");
+      }
+    } catch (err) {
+      console.error("Submit error:", err);
+      setError("Something went wrong. Try again later.");
+    }
   };
 
   return (
     <form onSubmit={handleSubmit}>
       <h2>Add New MCQ</h2>
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      {success && <p style={{ color: "green" }}>{success}</p>}
 
       <input
         type="text"
@@ -58,7 +74,9 @@ export default function MCQForm() {
         value={question}
         onChange={(e) => setQuestion(e.target.value)}
         required
-      /><br /><br />
+      />
+      <br />
+      <br />
 
       {options.map((opt, idx) => (
         <div key={idx}>
@@ -68,7 +86,9 @@ export default function MCQForm() {
             value={opt}
             onChange={(e) => handleOptionChange(idx, e.target.value)}
             required
-          /><br /><br />
+          />
+          <br />
+          <br />
         </div>
       ))}
 
@@ -78,9 +98,11 @@ export default function MCQForm() {
         value={correctAnswer}
         onChange={(e) => setCorrectAnswer(e.target.value)}
         required
-      /><br /><br />
+      />
+      <br />
+      <br />
 
-      <button type="submit">Submit</button>
+      <button type="submit">Submit MCQ</button>
     </form>
   );
 }

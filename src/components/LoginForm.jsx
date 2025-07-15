@@ -39,8 +39,16 @@ export default function LoginForm() {
       if (response.ok) {
         if (isLogin) {
           localStorage.setItem("token", data.token);
+          localStorage.setItem("role", data.user.role); // Save role (optional)
+
           alert("Login successful!");
-          navigate("/admin");
+          if (data.user.role === "teacher") {
+            navigate("/admin");
+          } else if (data.user.role === "student") {
+            navigate("/student");
+          } else {
+            alert("Unknown role, cannot redirect.");
+          }
         } else {
           alert("Registration successful! Now log in.");
           setIsLogin(true);
