@@ -16,8 +16,6 @@ function authenticateToken(req, res, next) {
     console.log("SECRET_KEY value:", SECRET_KEY ? "Present" : "Missing");
     const decoded = jwt.verify(token, SECRET_KEY);
     console.log("Token decoded successfully:", decoded);
-    console.log("User role:", decoded.role);
-    console.log("User ID:", decoded.id);
 
     req.user = decoded;
     next(); // Pass control to next middleware or route handler

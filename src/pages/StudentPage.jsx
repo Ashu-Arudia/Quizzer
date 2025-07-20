@@ -97,7 +97,9 @@ export default function StudentPage() {
     const currentQuestion = questions[currentQuestionIndex];
     const userAnswer = selectedAnswers[currentQuestion._id];
     if (!userAnswer) {
-      setSubmitError("Please select an answer for the current question before submitting.");
+      setSubmitError(
+        "Please select an answer for the current question before submitting."
+      );
       setTimeout(() => setSubmitError(""), 4000);
       return;
     }
@@ -136,7 +138,8 @@ export default function StudentPage() {
   };
 
   const currentQuestion = questions[currentQuestionIndex];
-  const progressPercentage = ((currentQuestionIndex + 1) / questions.length) * 100;
+  const progressPercentage =
+    ((currentQuestionIndex + 1) / questions.length) * 100;
   const answeredQuestions = Object.keys(selectedAnswers).length;
 
   // Fullscreen quiz view
@@ -145,7 +148,9 @@ export default function StudentPage() {
       <div className="quiz-fullscreen">
         <div className="quiz-header-fullscreen">
           <div className="quiz-info">
-            <h1>Question {currentQuestionIndex + 1} of {questions.length}</h1>
+            <h1>
+              Question {currentQuestionIndex + 1} of {questions.length}
+            </h1>
             <p>Quiz by {selectedTeacher.email}</p>
           </div>
           <button className="btn-exit-quiz" onClick={exitQuiz}>
@@ -154,16 +159,23 @@ export default function StudentPage() {
         </div>
         <div className="quiz-progress-fullscreen">
           <div className="progress-text">
-            Progress: {currentQuestionIndex + 1} / {questions.length} ({answeredQuestions} answered)
+            Progress: {currentQuestionIndex + 1} / {questions.length} (
+            {answeredQuestions} answered)
           </div>
           <div className="progress-bar">
-            <div className="progress-fill" style={{ width: `${progressPercentage}%` }}></div>
+            <div
+              className="progress-fill"
+              style={{ width: `${progressPercentage}%` }}
+            ></div>
           </div>
         </div>
         <div className="question-container-fullscreen">
           <div className="question-card-fullscreen">
             {submitError && (
-              <div className="message message-error" style={{ marginBottom: 20 }}>
+              <div
+                className="message message-error"
+                style={{ marginBottom: 20 }}
+              >
                 <span>⚠️</span>
                 {submitError}
               </div>
@@ -173,8 +185,14 @@ export default function StudentPage() {
               {currentQuestion.options.map((option, idx) => (
                 <li
                   key={idx}
-                  className={selectedAnswers[currentQuestion._id] === option ? "selected" : ""}
-                  onClick={() => handleAnswerSelect(currentQuestion._id, option)}
+                  className={
+                    selectedAnswers[currentQuestion._id] === option
+                      ? "selected"
+                      : ""
+                  }
+                  onClick={() =>
+                    handleAnswerSelect(currentQuestion._id, option)
+                  }
                 >
                   {option}
                 </li>
@@ -228,32 +246,63 @@ export default function StudentPage() {
         <div className="results-content-fullscreen">
           <div className="score-display">
             <div className="score-number">{results.score}</div>
-            <div className="score-text">out of {results.totalQuestions} correct</div>
+            <div className="score-text">
+              out of {results.totalQuestions} correct
+            </div>
             <div className="score-percentage">{results.percentage}%</div>
           </div>
           <div className="results-details">
             <h3>Detailed Results</h3>
             {results.questionResults.map((result, index) => (
-              <div key={index} style={{
-                marginBottom: "20px",
-                padding: "15px",
-                background: "white",
-                borderRadius: "10px",
-                border: `2px solid ${result.isCorrect ? "#28a745" : "#dc3545"}`
-              }}>
-                <p style={{ fontWeight: 600, marginBottom: 10, color: "#2c3e50" }}>
+              <div
+                key={index}
+                style={{
+                  marginBottom: "20px",
+                  padding: "15px",
+                  background: "white",
+                  borderRadius: "10px",
+                  border: `2px solid ${
+                    result.isCorrect ? "#28a745" : "#dc3545"
+                  }`,
+                }}
+              >
+                <p
+                  style={{
+                    fontWeight: 600,
+                    marginBottom: 10,
+                    color: "#2c3e50",
+                  }}
+                >
                   Question {index + 1}: {result.question}
                 </p>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.9rem" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    fontSize: "0.9rem",
+                  }}
+                >
                   <span style={{ color: "#6c757d" }}>
                     Your Answer: <strong>{result.userAnswer}</strong>
                   </span>
-                  <span style={{ color: result.isCorrect ? "#28a745" : "#dc3545", fontWeight: 600 }}>
+                  <span
+                    style={{
+                      color: result.isCorrect ? "#28a745" : "#dc3545",
+                      fontWeight: 600,
+                    }}
+                  >
                     {result.isCorrect ? "✓ Correct" : "✗ Incorrect"}
                   </span>
                 </div>
                 {!result.isCorrect && (
-                  <p style={{ marginTop: 8, color: "#28a745", fontSize: "0.9rem" }}>
+                  <p
+                    style={{
+                      marginTop: 8,
+                      color: "#28a745",
+                      fontSize: "0.9rem",
+                    }}
+                  >
                     Correct Answer: <strong>{result.correctAnswer}</strong>
                   </p>
                 )}
@@ -299,7 +348,9 @@ export default function StudentPage() {
             teachers.map((teacher) => (
               <li
                 key={teacher._id}
-                className={`teacher-item ${selectedTeacher?._id === teacher._id ? "selected" : ""}`}
+                className={`teacher-item ${
+                  selectedTeacher?._id === teacher._id ? "selected" : ""
+                }`}
                 onClick={() => handleSelectTeacher(teacher)}
               >
                 {teacher.email}
@@ -327,32 +378,52 @@ export default function StudentPage() {
                 </div>
               ) : (
                 <div style={{ textAlign: "center", marginTop: 30 }}>
-                  <div style={{ background: "#f8f9fa", borderRadius: 15, padding: 25, marginBottom: 30 }}>
-                    <h3 style={{ color: "#2c3e50", marginBottom: 15 }}>Quiz Information</h3>
+                  <div
+                    style={{
+                      background: "#f8f9fa",
+                      borderRadius: 15,
+                      padding: 25,
+                      marginBottom: 30,
+                    }}
+                  >
+                    <h3 style={{ color: "#2c3e50", marginBottom: 15 }}>
+                      Quiz Information
+                    </h3>
                     <p style={{ color: "#6c757d", marginBottom: 10 }}>
                       <strong>Total Questions:</strong> {questions.length}
                     </p>
-                    <p style={{ color: "#6c757d" }}>
+                    {/* <p style={{ color: "#6c757d" }}>
                       <strong>Time:</strong> No time limit
-                    </p>
+                    </p> */}
                   </div>
                   <button
                     className="btn btn-primary"
                     onClick={startQuiz}
                     style={{ fontSize: "1.2rem", padding: "15px 40px" }}
                   >
-                    🚀 Start Quiz
+                    Start Quiz
                   </button>
                 </div>
               )}
             </div>
           </div>
         ) : (
-          <div style={{ textAlign: "center", padding: "60px 20px", color: "#6c757d" }}>
-            <div style={{ fontSize: "4rem", marginBottom: 20, opacity: 0.5 }}>👨‍🏫</div>
-            <h2 style={{ color: "#2c3e50", marginBottom: 15 }}>Select a Teacher</h2>
-            <p style={{ fontSize: "1.2rem" }}>
-              Choose a teacher from the sidebar to start taking their quiz.
+          <div
+            style={{
+              textAlign: "center",
+              padding: "60px 20px",
+              color: "black",
+              fontWeight: "bold",
+            }}
+          >
+            <div style={{ fontSize: "4rem", marginBottom: 20 }}>👨‍🏫</div>
+            <h2
+              style={{ color: "black", marginBottom: 15, fontSize: "2.4rem" }}
+            >
+              Select a Teacher
+            </h2>
+            <p style={{ fontSize: "1.2rem", opacity: 0.7 }}>
+              Choose a teacher from the sidebar to start taking their quiz
             </p>
           </div>
         )}
