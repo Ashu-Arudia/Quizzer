@@ -150,9 +150,176 @@ export default function StudentPage() {
     setShowResults(true);
   };
 
+  const exitQuiz = () => {
+    resetQuiz();
+    setSelectedTeacher(null);
+    setQuestions([]);
+  };
+
   const currentQuestion = questions[currentQuestionIndex];
   const progressPercentage = ((currentQuestionIndex + 1) / questions.length) * 100;
   const answeredQuestions = Object.keys(selectedAnswers).length;
+
+  // If quiz is started, show only the quiz interface
+  if (quizStarted && !showResults) {
+    return (
+      <div className="quiz-fullscreen">
+        <div className="quiz-header-fullscreen">
+          <div className="quiz-info">
+            <h1>Question {currentQuestionIndex + 1} of {questions.length}</h1>
+            <p>Quiz by {selectedTeacher.email}</p>
+          </div>
+          <button className="btn-exit-quiz" onClick={exitQuiz}>
+            ✕ Exit Quiz
+          </button>
+        </div>
+
+        <div className="quiz-progress-fullscreen">
+          <div className="progress-text">
+            Progress: {currentQuestionIndex + 1} / {questions.length}
+            ({answeredQuestions} answered)
+          </div>
+          <div className="progress-bar">
+            <div
+              className="progress-fill"
+              style={{ width: `${progressPercentage}%` }}
+            ></div>
+          </div>
+        </div>
+
+        <div className="question-container-fullscreen">
+          <div className="question-card-fullscreen">
+            <p className="question-text">{currentQuestion.question}</p>
+
+            <ul className="mcq-options-fullscreen">
+              {currentQuestion.options.map((option, idx) => (
+                <li
+                  key={idx}
+                  className={`${
+                    selectedAnswers[currentQuestion._id] === option ? "selected" : ""
+                  }`}
+                  onClick={() => handleAnswerSelect(currentQuestion._id, option)}
+                >
+                  {option}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <div className="quiz-navigation-fullscreen">
+          <button
+            className="btn btn-secondary"
+            onClick={goToPreviousQuestion}
+            disabled={currentQuestionIndex === 0}
+          >
+            ← Previous
+          </button>
+
+          <div style={{ display: "flex", gap: "10px" }}>
+            {currentQuestionIndex < questions.length - 1 ? (
+              <button
+                className="btn btn-primary"
+                onClick={goToNextQuestion}
+                disabled={!selectedAnswers[currentQuestion._id]}
+              >
+                Next →
+              </button>
+            ) : (
+              <button
+                className="btn btn-success"
+                onClick={submitQuiz}
+                disabled={!selectedAnswers[currentQuestion._id]}
+              >
+                🎯 Submit Quiz
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // If showing results, show fullscreen results
+  if (showResults) {
+    return (
+      <div className="results-fullscreen">
+        <div className="results-header-fullscreen">
+          <h1>Quiz Results</h1>
+          <p>Quiz by {results.teacherName}</p>
+          <button className="btn-exit-quiz" onClick={exitQuiz}>
+            ✕ Back to Teachers
+          </button>
+        </div>
+
+        <div className="results-content-fullscreen">
+          <div className="score-display">
+            <div className="score-number">{results.score}</div>
+            <div className="score-text">out of {results.totalQuestions} correct</div>
+            <div className="score-percentage">{results.percentage}%</div>
+          </div>
+
+          <div className="results-details">
+            <h3>Detailed Results</h3>
+            {results.questionResults.map((result, index) => (
+              <div key={index} style={{
+                marginBottom: "20px",
+                padding: "15px",
+                background: "white",
+                borderRadius: "10px",
+                border: `2px solid ${result.isCorrect ? "#28a745" : "#dc3545"}`
+              }}>
+                <p style={{
+                  fontWeight: "600",
+                  marginBottom: "10px",
+                  color: "#2c3e50"
+                }}>
+                  Question {index + 1}: {result.question}
+                </p>
+                <div style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  fontSize: "0.9rem"
+                }}>
+                  <span style={{ color: "#6c757d" }}>
+                    Your Answer: <strong>{result.userAnswer}</strong>
+                  </span>
+                  <span style={{
+                    color: result.isCorrect ? "#28a745" : "#dc3545",
+                    fontWeight: "600"
+                  }}>
+                    {result.isCorrect ? "✓ Correct" : "✗ Incorrect"}
+                  </span>
+                </div>
+                {!result.isCorrect && (
+                  <p style={{
+                    marginTop: "8px",
+                    color: "#28a745",
+                    fontSize: "0.9rem"
+                  }}>
+                    Correct Answer: <strong>{result.correctAnswer}</strong>
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div style={{ marginTop: "30px", textAlign: "center" }}>
+            <button
+              className="btn btn-primary"
+              onClick={() => {
+                setShowResults(false);
+                resetQuiz();
+              }}
+            >
+              🔄 Take Quiz Again
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="student-page">
@@ -194,193 +361,49 @@ export default function StudentPage() {
       <div className="main-content">
         {selectedTeacher ? (
           <div className="quiz-container">
-            {!quizStarted ? (
-              // Quiz Start Screen
-              <div className="quiz-header">
-                <h1>Quiz by {selectedTeacher.email}</h1>
-                <p>Test your knowledge with these questions</p>
+            <div className="quiz-header">
+              <h1>Quiz by {selectedTeacher.email}</h1>
+              <p>Test your knowledge with these questions</p>
 
-                {loadingQuestions ? (
-                  <div className="loading">
-                    <div className="loading-spinner"></div>
-                    <p>Loading questions...</p>
-                  </div>
-                ) : questions.length === 0 ? (
-                  <div className="empty-message">
-                    <div className="empty-message-icon">📝</div>
-                    <h3>No Questions Available</h3>
-                    <p>This teacher hasn't added any questions yet.</p>
-                  </div>
-                ) : (
-                  <div style={{ textAlign: "center", marginTop: "30px" }}>
-                    <div style={{
-                      background: "#f8f9fa",
-                      borderRadius: "15px",
-                      padding: "25px",
-                      marginBottom: "30px"
-                    }}>
-                      <h3 style={{ color: "#2c3e50", marginBottom: "15px" }}>
-                        Quiz Information
-                      </h3>
-                      <p style={{ color: "#6c757d", marginBottom: "10px" }}>
-                        <strong>Total Questions:</strong> {questions.length}
-                      </p>
-                      <p style={{ color: "#6c757d" }}>
-                        <strong>Time:</strong> No time limit
-                      </p>
-                    </div>
-                    <button
-                      className="btn btn-primary"
-                      onClick={startQuiz}
-                      style={{ fontSize: "1.2rem", padding: "15px 40px" }}
-                    >
-                      🚀 Start Quiz
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : showResults ? (
-              // Results Screen
-              <div className="results-container">
-                <div className="results-header">
-                  <h1>Quiz Results</h1>
-                  <p>Quiz by {results.teacherName}</p>
+              {loadingQuestions ? (
+                <div className="loading">
+                  <div className="loading-spinner"></div>
+                  <p>Loading questions...</p>
                 </div>
-
-                <div className="score-display">
-                  <div className="score-number">{results.score}</div>
-                  <div className="score-text">out of {results.totalQuestions} correct</div>
-                  <div className="score-percentage">{results.percentage}%</div>
+              ) : questions.length === 0 ? (
+                <div className="empty-message">
+                  <div className="empty-message-icon">📝</div>
+                  <h3>No Questions Available</h3>
+                  <p>This teacher hasn't added any questions yet.</p>
                 </div>
-
-                <div className="results-details">
-                  <h3>Detailed Results</h3>
-                  {results.questionResults.map((result, index) => (
-                    <div key={index} style={{
-                      marginBottom: "20px",
-                      padding: "15px",
-                      background: "white",
-                      borderRadius: "10px",
-                      border: `2px solid ${result.isCorrect ? "#28a745" : "#dc3545"}`
-                    }}>
-                      <p style={{
-                        fontWeight: "600",
-                        marginBottom: "10px",
-                        color: "#2c3e50"
-                      }}>
-                        Question {index + 1}: {result.question}
-                      </p>
-                      <div style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        fontSize: "0.9rem"
-                      }}>
-                        <span style={{ color: "#6c757d" }}>
-                          Your Answer: <strong>{result.userAnswer}</strong>
-                        </span>
-                        <span style={{
-                          color: result.isCorrect ? "#28a745" : "#dc3545",
-                          fontWeight: "600"
-                        }}>
-                          {result.isCorrect ? "✓ Correct" : "✗ Incorrect"}
-                        </span>
-                      </div>
-                      {!result.isCorrect && (
-                        <p style={{
-                          marginTop: "8px",
-                          color: "#28a745",
-                          fontSize: "0.9rem"
-                        }}>
-                          Correct Answer: <strong>{result.correctAnswer}</strong>
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-
-                <div style={{ marginTop: "30px" }}>
+              ) : (
+                <div style={{ textAlign: "center", marginTop: "30px" }}>
+                  <div style={{
+                    background: "#f8f9fa",
+                    borderRadius: "15px",
+                    padding: "25px",
+                    marginBottom: "30px"
+                  }}>
+                    <h3 style={{ color: "#2c3e50", marginBottom: "15px" }}>
+                      Quiz Information
+                    </h3>
+                    <p style={{ color: "#6c757d", marginBottom: "10px" }}>
+                      <strong>Total Questions:</strong> {questions.length}
+                    </p>
+                    <p style={{ color: "#6c757d" }}>
+                      <strong>Time:</strong> No time limit
+                    </p>
+                  </div>
                   <button
                     className="btn btn-primary"
-                    onClick={() => {
-                      setShowResults(false);
-                      resetQuiz();
-                    }}
+                    onClick={startQuiz}
+                    style={{ fontSize: "1.2rem", padding: "15px 40px" }}
                   >
-                    🔄 Take Quiz Again
+                    🚀 Start Quiz
                   </button>
                 </div>
-              </div>
-            ) : (
-              // Quiz Questions Screen
-              <>
-                <div className="quiz-header">
-                  <h1>Question {currentQuestionIndex + 1} of {questions.length}</h1>
-                  <p>Quiz by {selectedTeacher.email}</p>
-                </div>
-
-                <div className="quiz-progress">
-                  <div className="progress-text">
-                    Progress: {currentQuestionIndex + 1} / {questions.length}
-                    ({answeredQuestions} answered)
-                  </div>
-                  <div className="progress-bar">
-                    <div
-                      className="progress-fill"
-                      style={{ width: `${progressPercentage}%` }}
-                    ></div>
-                  </div>
-                </div>
-
-                <div className="question-card">
-                  <p className="question-text">{currentQuestion.question}</p>
-
-                  <ul className="mcq-options">
-                    {currentQuestion.options.map((option, idx) => (
-                      <li
-                        key={idx}
-                        className={`${
-                          selectedAnswers[currentQuestion._id] === option ? "selected" : ""
-                        }`}
-                        onClick={() => handleAnswerSelect(currentQuestion._id, option)}
-                      >
-                        {option}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="quiz-navigation">
-                  <button
-                    className="btn btn-secondary"
-                    onClick={goToPreviousQuestion}
-                    disabled={currentQuestionIndex === 0}
-                  >
-                    ← Previous
-                  </button>
-
-                  <div style={{ display: "flex", gap: "10px" }}>
-                    {currentQuestionIndex < questions.length - 1 ? (
-                      <button
-                        className="btn btn-primary"
-                        onClick={goToNextQuestion}
-                        disabled={!selectedAnswers[currentQuestion._id]}
-                      >
-                        Next →
-                      </button>
-                    ) : (
-                      <button
-                        className="btn btn-success"
-                        onClick={submitQuiz}
-                        disabled={!selectedAnswers[currentQuestion._id]}
-                      >
-                        🎯 Submit Quiz
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </>
-            )}
+              )}
+            </div>
           </div>
         ) : (
           <div style={{
