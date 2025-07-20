@@ -138,7 +138,7 @@ export default function MCQForm({ onMCQAdded }) {
                 width: "35px",
                 height: "35px",
                 borderRadius: "50%",
-                background: "#667eea",
+                background: "#1e3c72",
                 color: "white",
                 display: "flex",
                 alignItems: "center",
@@ -151,7 +151,7 @@ export default function MCQForm({ onMCQAdded }) {
               </div>
               <span style={{
                 fontSize: "1rem",
-                color: "#6c757d",
+                color: "#6b7280",
                 fontWeight: "500",
                 minWidth: "80px"
               }}>
@@ -182,12 +182,12 @@ export default function MCQForm({ onMCQAdded }) {
                   width: "18px",
                   height: "18px",
                   cursor: "pointer",
-                  accentColor: "#667eea"
+                  accentColor: "#1e3c72"
                 }}
               />
               <span style={{
                 fontSize: "0.95rem",
-                color: correctIndex === idx ? "#28a745" : "#6c757d",
+                color: correctIndex === idx ? "#10b981" : "#6b7280",
                 fontWeight: correctIndex === idx ? "600" : "400"
               }}>
                 {correctIndex === idx ? "✓ Correct Answer" : "Mark as correct"}
