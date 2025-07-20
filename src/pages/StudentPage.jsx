@@ -6,15 +6,30 @@ export default function StudentPage() {
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [loadingQuestions, setLoadingQuestions] = useState(false);
+  const [loadingTeachers, setLoadingTeachers] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchTeachers = async () => {
+      setLoadingTeachers(true);
+      setError("");
       try {
-        const res = await fetch("http://localhost:8000/api/teachers");
+        console.log("Fetching teachers from:", "http://localhost:8000/api/user/teachers");
+        const res = await fetch("http://localhost:8000/api/user/teachers");
+        console.log("Response status:", res.status);
+
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+
         const data = await res.json();
+        console.log("Teachers data received:", data);
         setTeachers(data.teachers || []);
       } catch (err) {
         console.error("Failed to load teachers", err);
+        setError("Failed to load teachers. Please try again.");
+      } finally {
+        setLoadingTeachers(false);
       }
     };
     fetchTeachers();
@@ -31,8 +46,16 @@ export default function StudentPage() {
     setLoadingQuestions(true);
 
     try {
+      console.log("Fetching MCQs for teacher:", teacher._id);
       const res = await fetch(`http://localhost:8000/api/mcq/${teacher._id}`);
+      console.log("MCQ response status:", res.status);
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
       const data = await res.json();
+      console.log("MCQ data received:", data);
       setQuestions(Array.isArray(data.questions) ? data.questions : []);
     } catch (err) {
       console.error("Failed to load questions", err);
@@ -46,8 +69,21 @@ export default function StudentPage() {
     <div className="student-page">
       <div className="sidebar">
         <h2>Teachers</h2>
+
+        {loadingTeachers && (
+          <div className="loading">
+            <p>Loading teachers...</p>
+          </div>
+        )}
+
+        {error && (
+          <div className="error-message">
+            <p>{error}</p>
+          </div>
+        )}
+
         <ul className="teacher-list">
-          {teachers.length === 0 ? (
+          {!loadingTeachers && teachers.length === 0 ? (
             <p>No teachers found.</p>
           ) : (
             teachers.map((teacher) => (
