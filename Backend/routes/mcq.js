@@ -54,9 +54,7 @@ router.get(
   authorizeRoles("teacher"),
   async (req, res) => {
     try {
-      console.log("Fetching MCQs for user:", req.user.id);
       const mcqs = await MCQ.find({ createdBy: req.user.id });
-      console.log("Found MCQs:", mcqs.length);
       res.json(mcqs);
     } catch (err) {
       console.error("Error fetching MCQs:", err);
@@ -85,8 +83,6 @@ router.delete(
   authorizeRoles("teacher"),
   async (req, res) => {
     try {
-      console.log("Deleting MCQ:", req.params.id, "for user:", req.user.id);
-
       const mcq = await MCQ.findOneAndDelete({
         _id: req.params.id,
         createdBy: req.user.id,
@@ -97,11 +93,8 @@ router.delete(
           .status(404)
           .json({ error: "MCQ not found or access denied" });
       }
-
-      console.log("MCQ deleted successfully");
       res.json({ msg: "MCQ deleted successfully" });
     } catch (err) {
-      console.error("Error deleting MCQ:", err);
       res.status(500).json({ error: "Server error", details: err.message });
     }
   }
