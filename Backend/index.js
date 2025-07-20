@@ -19,10 +19,11 @@ app.use(cors());
 
 //middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 //routes
-app.use("/api", authRoutes);
+app.use("/api/auth", authRoutes);
 app.use("/api/mcq", mcqRoutes);
-app.use("/api/", userRoutes);
+app.use("/api/user", userRoutes);
 
 app.listen(process.env.PORT, () => console.log("Server started!!"));

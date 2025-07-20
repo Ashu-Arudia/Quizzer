@@ -18,8 +18,8 @@ export default function LoginForm() {
     }
 
     const url = isLogin
-      ? "http://localhost:8000/api/login"
-      : "http://localhost:8000/api/register";
+      ? "http://localhost:8000/api/auth/login"
+      : "http://localhost:8000/api/auth/register";
 
     const payload = isLogin
       ? { email: username, password }
@@ -39,7 +39,7 @@ export default function LoginForm() {
       if (response.ok) {
         if (isLogin) {
           localStorage.setItem("token", data.token);
-          localStorage.setItem("role", data.user.role); // Save role (optional)
+          localStorage.setItem("role", data.user.role);
 
           alert("Login successful!");
           if (data.user.role === "teacher") {

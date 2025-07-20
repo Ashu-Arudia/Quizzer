@@ -3,7 +3,7 @@ import { useState } from "react";
 export default function MCQForm() {
   const [question, setQuestion] = useState("");
   const [options, setOptions] = useState(["", "", "", ""]);
-  const [correctAnswer, setCorrectAnswer] = useState("");
+  const [correctIndex, setCorrectIndex] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -18,21 +18,19 @@ export default function MCQForm() {
     setError("");
     setSuccess("");
 
-    // ✅ Validation
     if (!question.trim()) return setError("Question cannot be empty.");
     if (options.some((opt) => !opt.trim()))
       return setError("All options must be filled.");
     if (new Set(options).size !== options.length)
       return setError("Options must be unique.");
-    if (!options.includes(correctAnswer))
-      return setError("Correct answer must match one of the options.");
+    if (correctIndex === null || !options[correctIndex])
+      return setError("You must select the correct answer.");
 
+    const correctAnswer = options[correctIndex];
     const mcq = { question, options, correctAnswer };
 
     const token = localStorage.getItem("token");
-    if (!token) {
-      return setError("User not authenticated. Please log in again.");
-    }
+    if (!token) return setError("User not authenticated. Please log in again.");
 
     try {
       const response = await fetch("http://localhost:8000/api/mcq", {
@@ -48,10 +46,9 @@ export default function MCQForm() {
 
       if (response.ok) {
         setSuccess("MCQ submitted successfully!");
-        // Clear form
         setQuestion("");
         setOptions(["", "", "", ""]);
-        setCorrectAnswer("");
+        setCorrectIndex(null);
       } else {
         setError(data.msg || "Failed to submit MCQ");
       }
@@ -79,28 +76,25 @@ export default function MCQForm() {
       <br />
 
       {options.map((opt, idx) => (
-        <div key={idx}>
+        <div key={idx} style={{ marginBottom: "10px", display: "flex" }}>
+          <div style={{ padding: "8px", fontWeight: "bold" }}>{idx + 1}</div>
           <input
             type="text"
             placeholder={`Option ${idx + 1}`}
             value={opt}
             onChange={(e) => handleOptionChange(idx, e.target.value)}
             required
+            style={{ width: "300px" }}
           />
-          <br />
-          <br />
+          <input
+            type="radio"
+            name="correctAnswer"
+            checked={correctIndex === idx}
+            onChange={() => setCorrectIndex(idx)}
+            style={{ marginRight: "4px" }}
+          />
         </div>
       ))}
-
-      <input
-        type="text"
-        placeholder="Correct Answer"
-        value={correctAnswer}
-        onChange={(e) => setCorrectAnswer(e.target.value)}
-        required
-      />
-      <br />
-      <br />
 
       <button type="submit">Submit MCQ</button>
     </form>
