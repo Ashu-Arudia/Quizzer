@@ -16,28 +16,20 @@ export default function StudentPage() {
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [results, setResults] = useState(null);
   const [showResults, setShowResults] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   useEffect(() => {
     const fetchTeachers = async () => {
       setLoadingTeachers(true);
       setError("");
       try {
-        console.log(
-          "Fetching teachers from:",
-          "http://localhost:8000/api/user/teachers"
-        );
         const res = await fetch("http://localhost:8000/api/user/teachers");
-        console.log("Response status:", res.status);
-
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);
         }
-
         const data = await res.json();
-        console.log("Teachers data received:", data);
         setTeachers(data.teachers || []);
       } catch (err) {
-        console.error("Failed to load teachers", err);
         setError("Failed to load teachers. Please try again.");
       } finally {
         setLoadingTeachers(false);
@@ -53,25 +45,17 @@ export default function StudentPage() {
       resetQuiz();
       return;
     }
-
     setSelectedTeacher(teacher);
     setLoadingQuestions(true);
     resetQuiz();
-
     try {
-      console.log("Fetching MCQs for teacher:", teacher._id);
       const res = await fetch(`http://localhost:8000/api/mcq/${teacher._id}`);
-      console.log("MCQ response status:", res.status);
-
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
-
       const data = await res.json();
-      console.log("MCQ data received:", data);
       setQuestions(Array.isArray(data.questions) ? data.questions : []);
     } catch (err) {
-      console.error("Failed to load questions", err);
       setQuestions([]);
     } finally {
       setLoadingQuestions(false);
@@ -85,6 +69,7 @@ export default function StudentPage() {
     setQuizCompleted(false);
     setResults(null);
     setShowResults(false);
+    setSubmitError("");
   };
 
   const startQuiz = () => {
@@ -93,10 +78,7 @@ export default function StudentPage() {
   };
 
   const handleAnswerSelect = (questionId, answer) => {
-    setSelectedAnswers((prev) => ({
-      ...prev,
-      [questionId]: answer,
-    }));
+    setSelectedAnswers((prev) => ({ ...prev, [questionId]: answer }));
   };
 
   const goToNextQuestion = () => {
@@ -114,21 +96,16 @@ export default function StudentPage() {
   const submitQuiz = () => {
     const currentQuestion = questions[currentQuestionIndex];
     const userAnswer = selectedAnswers[currentQuestion._id];
-
     if (!userAnswer) {
-      alert(
-        "Please select an answer for the current question before submitting."
-      );
+      setSubmitError("Please select an answer for the current question before submitting.");
+      setTimeout(() => setSubmitError(""), 4000);
       return;
     }
-
-    // Calculate results
     let correctAnswers = 0;
     const questionResults = questions.map((question) => {
       const userAnswer = selectedAnswers[question._id];
       const isCorrect = userAnswer === question.correctAnswer;
       if (isCorrect) correctAnswers++;
-
       return {
         question: question.question,
         userAnswer,
@@ -137,11 +114,9 @@ export default function StudentPage() {
         options: question.options,
       };
     });
-
     const score = correctAnswers;
     const totalQuestions = questions.length;
     const percentage = Math.round((score / totalQuestions) * 100);
-
     const quizResults = {
       score,
       totalQuestions,
@@ -149,7 +124,6 @@ export default function StudentPage() {
       questionResults,
       teacherName: selectedTeacher.email,
     };
-
     setResults(quizResults);
     setQuizCompleted(true);
     setShowResults(true);
@@ -162,54 +136,45 @@ export default function StudentPage() {
   };
 
   const currentQuestion = questions[currentQuestionIndex];
-  const progressPercentage =
-    ((currentQuestionIndex + 1) / questions.length) * 100;
+  const progressPercentage = ((currentQuestionIndex + 1) / questions.length) * 100;
   const answeredQuestions = Object.keys(selectedAnswers).length;
 
+  // Fullscreen quiz view
   if (quizStarted && !showResults) {
     return (
       <div className="quiz-fullscreen">
         <div className="quiz-header-fullscreen">
           <div className="quiz-info">
-            <h1>
-              Question {currentQuestionIndex + 1} of {questions.length}
-            </h1>
+            <h1>Question {currentQuestionIndex + 1} of {questions.length}</h1>
             <p>Quiz by {selectedTeacher.email}</p>
           </div>
           <button className="btn-exit-quiz" onClick={exitQuiz}>
             ✕ Exit Quiz
           </button>
         </div>
-
         <div className="quiz-progress-fullscreen">
           <div className="progress-text">
-            Progress: {currentQuestionIndex + 1} / {questions.length}(
-            {answeredQuestions} answered)
+            Progress: {currentQuestionIndex + 1} / {questions.length} ({answeredQuestions} answered)
           </div>
           <div className="progress-bar">
-            <div
-              className="progress-fill"
-              style={{ width: `${progressPercentage}%` }}
-            ></div>
+            <div className="progress-fill" style={{ width: `${progressPercentage}%` }}></div>
           </div>
         </div>
-
         <div className="question-container-fullscreen">
           <div className="question-card-fullscreen">
+            {submitError && (
+              <div className="message message-error" style={{ marginBottom: 20 }}>
+                <span>⚠️</span>
+                {submitError}
+              </div>
+            )}
             <p className="question-text">{currentQuestion.question}</p>
-
             <ul className="mcq-options-fullscreen">
               {currentQuestion.options.map((option, idx) => (
                 <li
                   key={idx}
-                  className={`${
-                    selectedAnswers[currentQuestion._id] === option
-                      ? "selected"
-                      : ""
-                  }`}
-                  onClick={() =>
-                    handleAnswerSelect(currentQuestion._id, option)
-                  }
+                  className={selectedAnswers[currentQuestion._id] === option ? "selected" : ""}
+                  onClick={() => handleAnswerSelect(currentQuestion._id, option)}
                 >
                   {option}
                 </li>
@@ -217,7 +182,6 @@ export default function StudentPage() {
             </ul>
           </div>
         </div>
-
         <div className="quiz-navigation-fullscreen">
           <button
             className="btn btn-secondary"
@@ -226,7 +190,6 @@ export default function StudentPage() {
           >
             ← Previous
           </button>
-
           <div style={{ display: "flex", gap: "10px" }}>
             {currentQuestionIndex < questions.length - 1 ? (
               <button
@@ -251,6 +214,7 @@ export default function StudentPage() {
     );
   }
 
+  // Fullscreen results view
   if (showResults) {
     return (
       <div className="results-fullscreen">
@@ -261,76 +225,42 @@ export default function StudentPage() {
             ✕ Back to Teachers
           </button>
         </div>
-
         <div className="results-content-fullscreen">
           <div className="score-display">
             <div className="score-number">{results.score}</div>
-            <div className="score-text">
-              out of {results.totalQuestions} correct
-            </div>
+            <div className="score-text">out of {results.totalQuestions} correct</div>
             <div className="score-percentage">{results.percentage}%</div>
           </div>
-
           <div className="results-details">
             <h3>Detailed Results</h3>
             {results.questionResults.map((result, index) => (
-              <div
-                key={index}
-                style={{
-                  marginBottom: "20px",
-                  padding: "15px",
-                  background: "white",
-                  borderRadius: "10px",
-                  border: `2px solid ${
-                    result.isCorrect ? "#28a745" : "#dc3545"
-                  }`,
-                }}
-              >
-                <p
-                  style={{
-                    fontWeight: "600",
-                    marginBottom: "10px",
-                    color: "#2c3e50",
-                  }}
-                >
+              <div key={index} style={{
+                marginBottom: "20px",
+                padding: "15px",
+                background: "white",
+                borderRadius: "10px",
+                border: `2px solid ${result.isCorrect ? "#28a745" : "#dc3545"}`
+              }}>
+                <p style={{ fontWeight: 600, marginBottom: 10, color: "#2c3e50" }}>
                   Question {index + 1}: {result.question}
                 </p>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    fontSize: "0.9rem",
-                  }}
-                >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.9rem" }}>
                   <span style={{ color: "#6c757d" }}>
                     Your Answer: <strong>{result.userAnswer}</strong>
                   </span>
-                  <span
-                    style={{
-                      color: result.isCorrect ? "#28a745" : "#dc3545",
-                      fontWeight: "600",
-                    }}
-                  >
+                  <span style={{ color: result.isCorrect ? "#28a745" : "#dc3545", fontWeight: 600 }}>
                     {result.isCorrect ? "✓ Correct" : "✗ Incorrect"}
                   </span>
                 </div>
                 {!result.isCorrect && (
-                  <p
-                    style={{
-                      marginTop: "8px",
-                      color: "#28a745",
-                      fontSize: "0.9rem",
-                    }}
-                  >
+                  <p style={{ marginTop: 8, color: "#28a745", fontSize: "0.9rem" }}>
                     Correct Answer: <strong>{result.correctAnswer}</strong>
                   </p>
                 )}
               </div>
             ))}
           </div>
-
-          <div style={{ marginTop: "30px", textAlign: "center" }}>
+          <div style={{ marginTop: 30, textAlign: "center" }}>
             <button
               className="btn btn-primary"
               onClick={() => {
@@ -346,24 +276,22 @@ export default function StudentPage() {
     );
   }
 
+  // Default view with sidebar and teacher selection
   return (
     <div className="student-page">
       <div className="sidebar">
         <h2>Teachers</h2>
-
         {loadingTeachers && (
           <div className="loading">
             <div className="loading-spinner"></div>
             <p>Loading teachers...</p>
           </div>
         )}
-
         {error && (
           <div className="error-message">
             <p>{error}</p>
           </div>
         )}
-
         <ul className="teacher-list">
           {!loadingTeachers && teachers.length === 0 ? (
             <p>No teachers found.</p>
@@ -371,9 +299,7 @@ export default function StudentPage() {
             teachers.map((teacher) => (
               <li
                 key={teacher._id}
-                className={`teacher-item ${
-                  selectedTeacher?._id === teacher._id ? "selected" : ""
-                }`}
+                className={`teacher-item ${selectedTeacher?._id === teacher._id ? "selected" : ""}`}
                 onClick={() => handleSelectTeacher(teacher)}
               >
                 {teacher.email}
@@ -382,14 +308,12 @@ export default function StudentPage() {
           )}
         </ul>
       </div>
-
       <div className="main-content">
         {selectedTeacher ? (
           <div className="quiz-container">
             <div className="quiz-header">
               <h1>Quiz by {selectedTeacher.email}</h1>
               <p>Test your knowledge with these questions</p>
-
               {loadingQuestions ? (
                 <div className="loading">
                   <div className="loading-spinner"></div>
@@ -402,19 +326,10 @@ export default function StudentPage() {
                   <p>This teacher hasn't added any questions yet.</p>
                 </div>
               ) : (
-                <div style={{ textAlign: "center", marginTop: "30px" }}>
-                  <div
-                    style={{
-                      background: "#f8f9fa",
-                      borderRadius: "15px",
-                      padding: "25px",
-                      marginBottom: "30px",
-                    }}
-                  >
-                    <h3 style={{ color: "#2c3e50", marginBottom: "15px" }}>
-                      Quiz Information
-                    </h3>
-                    <p style={{ color: "#6c757d", marginBottom: "10px" }}>
+                <div style={{ textAlign: "center", marginTop: 30 }}>
+                  <div style={{ background: "#f8f9fa", borderRadius: 15, padding: 25, marginBottom: 30 }}>
+                    <h3 style={{ color: "#2c3e50", marginBottom: 15 }}>Quiz Information</h3>
+                    <p style={{ color: "#6c757d", marginBottom: 10 }}>
                       <strong>Total Questions:</strong> {questions.length}
                     </p>
                     <p style={{ color: "#6c757d" }}>
@@ -433,21 +348,9 @@ export default function StudentPage() {
             </div>
           </div>
         ) : (
-          <div
-            style={{
-              textAlign: "center",
-              padding: "60px 20px",
-              color: "#6c757d",
-            }}
-          >
-            <div
-              style={{ fontSize: "4rem", marginBottom: "20px", opacity: "0.5" }}
-            >
-              👨‍🏫
-            </div>
-            <h2 style={{ color: "#2c3e50", marginBottom: "15px" }}>
-              Select a Teacher
-            </h2>
+          <div style={{ textAlign: "center", padding: "60px 20px", color: "#6c757d" }}>
+            <div style={{ fontSize: "4rem", marginBottom: 20, opacity: 0.5 }}>👨‍🏫</div>
+            <h2 style={{ color: "#2c3e50", marginBottom: 15 }}>Select a Teacher</h2>
             <p style={{ fontSize: "1.2rem" }}>
               Choose a teacher from the sidebar to start taking their quiz.
             </p>

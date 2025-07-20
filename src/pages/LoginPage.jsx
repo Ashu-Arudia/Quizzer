@@ -7,8 +7,13 @@ export default function LoginPage() {
       <div className="login-branding">
         <div className="branding-content">
           <div className="brand-logo">
-            <div className="logo-icon">📚</div>
-            <h1 className="brand-title">MCQ Portal</h1>
+            <div className="logo-icon">🧠 </div>
+            <h1
+              className="brand-title"
+              style={{ fontWeight: "bold", color: "violet" }}
+            >
+              MCQ Portal
+            </h1>
           </div>
           <div className="brand-description">
             <h2>Welcome to the Future of Learning</h2>

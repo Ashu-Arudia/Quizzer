@@ -23,15 +23,14 @@ export default function Header() {
     <header className="app-header">
       <div className="header-content">
         <div className="header-brand">
-          <span className="brand-icon">📚</span>
-          <h1 className="brand-title">MCQ Portal</h1>
+          <span className="brand-icon">🧠</span>
+          <h1 className="brand-title" style={{ fontWeight: "bold" }}>
+            MCQ Portal
+          </h1>
         </div>
 
         <div className="header-user">
           <div className="user-info">
-            <span className="user-role-icon">
-              {userRole === "teacher" ? "👨‍🏫" : "👨‍🎓"}
-            </span>
             <span className="user-email">{userEmail}</span>
           </div>
           <LogoutButton />

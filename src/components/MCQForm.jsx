@@ -204,7 +204,13 @@ export default function MCQForm({ onMCQAdded }) {
         ))}
       </div>
 
-      <div style={{ display: "flex", gap: "12px", marginTop: "30px" }}>
+      <div
+        style={{
+          display: "flex",
+          gap: "12px",
+          marginTop: "30px",
+        }}
+      >
         <button
           type="submit"
           className="btn-primary"
@@ -212,20 +218,12 @@ export default function MCQForm({ onMCQAdded }) {
           style={{
             opacity: isSubmitting ? 0.7 : 1,
             flex: 1,
+            height: "6vh",
+            cursor: "pointer",
           }}
         >
-          {isSubmitting ? "Adding MCQ..." : "➕ Add MCQ"}
+          {isSubmitting ? "Adding MCQ..." : "Add MCQ"}
         </button>
-
-        {/* <button
-          type="button"
-          className="btn btn-cancel"
-          onClick={resetForm}
-          disabled={isSubmitting}
-          style={{ minWidth: "100px" }}
-        >
-          🔄 Reset
-        </button> */}
       </div>
     </form>
   );

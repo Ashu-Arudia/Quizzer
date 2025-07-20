@@ -6,6 +6,8 @@ export default function AdminPage() {
   const [mcqs, setMcqs] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [deleteError, setDeleteError] = useState("");
+  const [editMessage, setEditMessage] = useState("");
 
   useEffect(() => {
     console.log("useEffect started");
@@ -25,7 +27,9 @@ export default function AdminPage() {
 
     if (role !== "teacher") {
       console.warn("User is not a teacher; setting error");
-      setError(`Access denied: You are logged in as a ${role}, but only teachers can view MCQs.`);
+      setError(
+        `Access denied: You are logged in as a ${role}, but only teachers can view MCQs.`
+      );
       setLoading(false);
       return;
     }
@@ -44,7 +48,7 @@ export default function AdminPage() {
         console.log("Response headers:", res.headers);
 
         if (!res.ok) {
-          return res.json().then(errorData => {
+          return res.json().then((errorData) => {
             console.error("Server error response:", errorData);
             throw new Error(errorData.error || "Failed to fetch MCQs");
           });
@@ -69,6 +73,8 @@ export default function AdminPage() {
     }
 
     const token = localStorage.getItem("token");
+    setDeleteError(""); // Clear any previous errors
+
     try {
       const response = await fetch(`http://localhost:8000/api/mcq/${mcqId}`, {
         method: "DELETE",
@@ -79,15 +85,25 @@ export default function AdminPage() {
       });
 
       if (response.ok) {
-        setMcqs(mcqs.filter(mcq => mcq._id !== mcqId));
+        setMcqs(mcqs.filter((mcq) => mcq._id !== mcqId));
+        // Show success message briefly
+        setEditMessage("MCQ deleted successfully!");
+        setTimeout(() => setEditMessage(""), 3000);
       } else {
         const errorData = await response.json();
-        alert(errorData.error || "Failed to delete MCQ");
+        setDeleteError(errorData.error || "Failed to delete MCQ");
+        setTimeout(() => setDeleteError(""), 5000);
       }
     } catch (err) {
       console.error("Delete error:", err);
-      alert("Failed to delete MCQ");
+      setDeleteError("Failed to delete MCQ. Please try again.");
+      setTimeout(() => setDeleteError(""), 5000);
     }
+  };
+
+  const handleEditClick = () => {
+    setEditMessage("Edit functionality coming soon! Stay tuned for updates.");
+    setTimeout(() => setEditMessage(""), 4000);
   };
 
   return (
@@ -116,6 +132,20 @@ export default function AdminPage() {
               </div>
             )}
 
+            {deleteError && (
+              <div className="message message-error">
+                <span>❌</span>
+                {deleteError}
+              </div>
+            )}
+
+            {editMessage && (
+              <div className="message message-info">
+                <span>ℹ️</span>
+                {editMessage}
+              </div>
+            )}
+
             {loading && (
               <div className="loading">
                 <div className="loading-spinner"></div>
@@ -127,7 +157,9 @@ export default function AdminPage() {
               <div className="empty-state">
                 <div className="empty-state-icon">📝</div>
                 <h3>No MCQs Yet</h3>
-                <p>Start by adding your first multiple choice question above!</p>
+                <p>
+                  Start by adding your first multiple choice question above!
+                </p>
               </div>
             )}
 
@@ -135,15 +167,15 @@ export default function AdminPage() {
               <div className="mcq-grid">
                 {mcqs.map((mcq, index) => (
                   <div key={mcq._id || index} className="mcq-card">
-                    <div className="mcq-question">
-                      {mcq.question}
-                    </div>
+                    <div className="mcq-question">{mcq.question}</div>
 
                     <ul className="mcq-options">
                       {mcq.options.map((option, idx) => (
                         <li
                           key={idx}
-                          className={option === mcq.correctAnswer ? "mcq-correct" : ""}
+                          className={
+                            option === mcq.correctAnswer ? "mcq-correct" : ""
+                          }
                         >
                           {option}
                         </li>
@@ -153,15 +185,15 @@ export default function AdminPage() {
                     <div className="mcq-actions">
                       <button
                         className="btn btn-edit"
-                        onClick={() => alert("Edit functionality coming soon!")}
+                        onClick={handleEditClick}
                       >
-                        ✏️ Edit
+                        Edit
                       </button>
                       <button
                         className="btn btn-delete"
                         onClick={() => handleDeleteMCQ(mcq._id)}
                       >
-                        🗑️ Delete
+                        Delete
                       </button>
                     </div>
                   </div>

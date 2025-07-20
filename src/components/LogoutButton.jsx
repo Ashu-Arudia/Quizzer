@@ -12,7 +12,6 @@ export default function LogoutButton() {
 
   return (
     <button className="logout-button" onClick={handleLogout} title="Logout">
-      <span className="logout-icon">🚪</span>
       <span className="logout-text">Logout</span>
     </button>
   );
