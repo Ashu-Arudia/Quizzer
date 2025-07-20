@@ -1,11 +1,12 @@
 import { useState } from "react";
 
-export default function MCQForm() {
+export default function MCQForm({ onMCQAdded }) {
   const [question, setQuestion] = useState("");
   const [options, setOptions] = useState(["", "", "", ""]);
   const [correctIndex, setCorrectIndex] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleOptionChange = (index, value) => {
     const updatedOptions = [...options];
@@ -17,20 +18,38 @@ export default function MCQForm() {
     e.preventDefault();
     setError("");
     setSuccess("");
+    setIsSubmitting(true);
 
-    if (!question.trim()) return setError("Question cannot be empty.");
-    if (options.some((opt) => !opt.trim()))
-      return setError("All options must be filled.");
-    if (new Set(options).size !== options.length)
-      return setError("Options must be unique.");
-    if (correctIndex === null || !options[correctIndex])
-      return setError("You must select the correct answer.");
+    if (!question.trim()) {
+      setError("Question cannot be empty.");
+      setIsSubmitting(false);
+      return;
+    }
+    if (options.some((opt) => !opt.trim())) {
+      setError("All options must be filled.");
+      setIsSubmitting(false);
+      return;
+    }
+    if (new Set(options).size !== options.length) {
+      setError("Options must be unique.");
+      setIsSubmitting(false);
+      return;
+    }
+    if (correctIndex === null || !options[correctIndex]) {
+      setError("You must select the correct answer.");
+      setIsSubmitting(false);
+      return;
+    }
 
     const correctAnswer = options[correctIndex];
     const mcq = { question, options, correctAnswer };
 
     const token = localStorage.getItem("token");
-    if (!token) return setError("User not authenticated. Please log in again.");
+    if (!token) {
+      setError("User not authenticated. Please log in again.");
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       const response = await fetch("http://localhost:8000/api/mcq", {
@@ -45,58 +64,162 @@ export default function MCQForm() {
       const data = await response.json();
 
       if (response.ok) {
-        setSuccess("MCQ submitted successfully!");
+        setSuccess("MCQ added successfully! 🎉");
+
+        // Call the callback to update the parent component
+        if (onMCQAdded && data.mcq) {
+          onMCQAdded(data.mcq);
+        }
+
+        // Reset form
         setQuestion("");
         setOptions(["", "", "", ""]);
         setCorrectIndex(null);
+
+        // Clear success message after 3 seconds
+        setTimeout(() => setSuccess(""), 3000);
       } else {
         setError(data.msg || "Failed to submit MCQ");
       }
     } catch (err) {
       console.error("Submit error:", err);
       setError("Something went wrong. Try again later.");
+    } finally {
+      setIsSubmitting(false);
     }
+  };
+
+  const resetForm = () => {
+    setQuestion("");
+    setOptions(["", "", "", ""]);
+    setCorrectIndex(null);
+    setError("");
+    setSuccess("");
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <h2>Add New MCQ</h2>
-
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {success && <p style={{ color: "green" }}>{success}</p>}
-
-      <input
-        type="text"
-        placeholder="Enter question"
-        value={question}
-        onChange={(e) => setQuestion(e.target.value)}
-        required
-      />
-      <br />
-      <br />
-
-      {options.map((opt, idx) => (
-        <div key={idx} style={{ marginBottom: "10px", display: "flex" }}>
-          <div style={{ padding: "8px", fontWeight: "bold" }}>{idx + 1}</div>
-          <input
-            type="text"
-            placeholder={`Option ${idx + 1}`}
-            value={opt}
-            onChange={(e) => handleOptionChange(idx, e.target.value)}
-            required
-            style={{ width: "300px" }}
-          />
-          <input
-            type="radio"
-            name="correctAnswer"
-            checked={correctIndex === idx}
-            onChange={() => setCorrectIndex(idx)}
-            style={{ marginRight: "4px" }}
-          />
+      {error && (
+        <div className="message message-error">
+          <span>⚠️</span>
+          {error}
         </div>
-      ))}
+      )}
 
-      <button type="submit">Submit MCQ</button>
+      {success && (
+        <div className="message message-success">
+          <span>✅</span>
+          {success}
+        </div>
+      )}
+
+      <div className="form-group">
+        <label className="form-label">Question</label>
+        <textarea
+          className="form-input form-textarea"
+          placeholder="Enter your question here..."
+          value={question}
+          onChange={(e) => setQuestion(e.target.value)}
+          required
+        />
+      </div>
+
+      <div className="form-group">
+        <label className="form-label">Options</label>
+        {options.map((opt, idx) => (
+          <div key={idx} style={{ marginBottom: "20px" }}>
+            <div style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              marginBottom: "8px"
+            }}>
+              <div style={{
+                width: "35px",
+                height: "35px",
+                borderRadius: "50%",
+                background: "#667eea",
+                color: "white",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: "bold",
+                fontSize: "1rem",
+                flexShrink: 0
+              }}>
+                {idx + 1}
+              </div>
+              <span style={{
+                fontSize: "1rem",
+                color: "#6c757d",
+                fontWeight: "500",
+                minWidth: "80px"
+              }}>
+                Option {idx + 1}
+              </span>
+            </div>
+            <input
+              type="text"
+              className="form-input"
+              placeholder={`Enter option ${idx + 1}`}
+              value={opt}
+              onChange={(e) => handleOptionChange(idx, e.target.value)}
+              required
+              style={{ marginBottom: "8px" }}
+            />
+            <div style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              marginLeft: "47px"
+            }}>
+              <input
+                type="radio"
+                name="correctAnswer"
+                checked={correctIndex === idx}
+                onChange={() => setCorrectIndex(idx)}
+                style={{
+                  width: "18px",
+                  height: "18px",
+                  cursor: "pointer",
+                  accentColor: "#667eea"
+                }}
+              />
+              <span style={{
+                fontSize: "0.95rem",
+                color: correctIndex === idx ? "#28a745" : "#6c757d",
+                fontWeight: correctIndex === idx ? "600" : "400"
+              }}>
+                {correctIndex === idx ? "✓ Correct Answer" : "Mark as correct"}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ display: "flex", gap: "12px", marginTop: "30px" }}>
+        <button
+          type="submit"
+          className="btn-primary"
+          disabled={isSubmitting}
+          style={{
+            opacity: isSubmitting ? 0.7 : 1,
+            flex: 1
+          }}
+        >
+          {isSubmitting ? "Adding MCQ..." : "➕ Add MCQ"}
+        </button>
+
+        <button
+          type="button"
+          className="btn btn-cancel"
+          onClick={resetForm}
+          disabled={isSubmitting}
+          style={{ minWidth: "100px" }}
+        >
+          🔄 Reset
+        </button>
+      </div>
     </form>
   );
 }
