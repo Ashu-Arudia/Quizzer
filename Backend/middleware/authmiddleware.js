@@ -1,4 +1,4 @@
-require('dotenv').config();
+require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const SECRET_KEY = process.env.JWT_SECRET;
 
@@ -19,7 +19,7 @@ function authenticateToken(req, res, next) {
     console.log("User role:", decoded.role);
     console.log("User ID:", decoded.id);
 
-    req.user = decoded; // Attach decoded token payload (user info) to request
+    req.user = decoded;
     next(); // Pass control to next middleware or route handler
   } catch (err) {
     console.error("Token verification failed:", err.message);

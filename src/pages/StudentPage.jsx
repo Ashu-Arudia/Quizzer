@@ -22,7 +22,10 @@ export default function StudentPage() {
       setLoadingTeachers(true);
       setError("");
       try {
-        console.log("Fetching teachers from:", "http://localhost:8000/api/user/teachers");
+        console.log(
+          "Fetching teachers from:",
+          "http://localhost:8000/api/user/teachers"
+        );
         const res = await fetch("http://localhost:8000/api/user/teachers");
         console.log("Response status:", res.status);
 
@@ -90,9 +93,9 @@ export default function StudentPage() {
   };
 
   const handleAnswerSelect = (questionId, answer) => {
-    setSelectedAnswers(prev => ({
+    setSelectedAnswers((prev) => ({
       ...prev,
-      [questionId]: answer
+      [questionId]: answer,
     }));
   };
 
@@ -113,13 +116,15 @@ export default function StudentPage() {
     const userAnswer = selectedAnswers[currentQuestion._id];
 
     if (!userAnswer) {
-      alert("Please select an answer for the current question before submitting.");
+      alert(
+        "Please select an answer for the current question before submitting."
+      );
       return;
     }
 
     // Calculate results
     let correctAnswers = 0;
-    const questionResults = questions.map(question => {
+    const questionResults = questions.map((question) => {
       const userAnswer = selectedAnswers[question._id];
       const isCorrect = userAnswer === question.correctAnswer;
       if (isCorrect) correctAnswers++;
@@ -129,7 +134,7 @@ export default function StudentPage() {
         userAnswer,
         correctAnswer: question.correctAnswer,
         isCorrect,
-        options: question.options
+        options: question.options,
       };
     });
 
@@ -142,7 +147,7 @@ export default function StudentPage() {
       totalQuestions,
       percentage,
       questionResults,
-      teacherName: selectedTeacher.email
+      teacherName: selectedTeacher.email,
     };
 
     setResults(quizResults);
@@ -157,16 +162,18 @@ export default function StudentPage() {
   };
 
   const currentQuestion = questions[currentQuestionIndex];
-  const progressPercentage = ((currentQuestionIndex + 1) / questions.length) * 100;
+  const progressPercentage =
+    ((currentQuestionIndex + 1) / questions.length) * 100;
   const answeredQuestions = Object.keys(selectedAnswers).length;
 
-  // If quiz is started, show only the quiz interface
   if (quizStarted && !showResults) {
     return (
       <div className="quiz-fullscreen">
         <div className="quiz-header-fullscreen">
           <div className="quiz-info">
-            <h1>Question {currentQuestionIndex + 1} of {questions.length}</h1>
+            <h1>
+              Question {currentQuestionIndex + 1} of {questions.length}
+            </h1>
             <p>Quiz by {selectedTeacher.email}</p>
           </div>
           <button className="btn-exit-quiz" onClick={exitQuiz}>
@@ -176,8 +183,8 @@ export default function StudentPage() {
 
         <div className="quiz-progress-fullscreen">
           <div className="progress-text">
-            Progress: {currentQuestionIndex + 1} / {questions.length}
-            ({answeredQuestions} answered)
+            Progress: {currentQuestionIndex + 1} / {questions.length}(
+            {answeredQuestions} answered)
           </div>
           <div className="progress-bar">
             <div
@@ -196,9 +203,13 @@ export default function StudentPage() {
                 <li
                   key={idx}
                   className={`${
-                    selectedAnswers[currentQuestion._id] === option ? "selected" : ""
+                    selectedAnswers[currentQuestion._id] === option
+                      ? "selected"
+                      : ""
                   }`}
-                  onClick={() => handleAnswerSelect(currentQuestion._id, option)}
+                  onClick={() =>
+                    handleAnswerSelect(currentQuestion._id, option)
+                  }
                 >
                   {option}
                 </li>
@@ -240,7 +251,6 @@ export default function StudentPage() {
     );
   }
 
-  // If showing results, show fullscreen results
   if (showResults) {
     return (
       <div className="results-fullscreen">
@@ -255,49 +265,64 @@ export default function StudentPage() {
         <div className="results-content-fullscreen">
           <div className="score-display">
             <div className="score-number">{results.score}</div>
-            <div className="score-text">out of {results.totalQuestions} correct</div>
+            <div className="score-text">
+              out of {results.totalQuestions} correct
+            </div>
             <div className="score-percentage">{results.percentage}%</div>
           </div>
 
           <div className="results-details">
             <h3>Detailed Results</h3>
             {results.questionResults.map((result, index) => (
-              <div key={index} style={{
-                marginBottom: "20px",
-                padding: "15px",
-                background: "white",
-                borderRadius: "10px",
-                border: `2px solid ${result.isCorrect ? "#28a745" : "#dc3545"}`
-              }}>
-                <p style={{
-                  fontWeight: "600",
-                  marginBottom: "10px",
-                  color: "#2c3e50"
-                }}>
+              <div
+                key={index}
+                style={{
+                  marginBottom: "20px",
+                  padding: "15px",
+                  background: "white",
+                  borderRadius: "10px",
+                  border: `2px solid ${
+                    result.isCorrect ? "#28a745" : "#dc3545"
+                  }`,
+                }}
+              >
+                <p
+                  style={{
+                    fontWeight: "600",
+                    marginBottom: "10px",
+                    color: "#2c3e50",
+                  }}
+                >
                   Question {index + 1}: {result.question}
                 </p>
-                <div style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  fontSize: "0.9rem"
-                }}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    fontSize: "0.9rem",
+                  }}
+                >
                   <span style={{ color: "#6c757d" }}>
                     Your Answer: <strong>{result.userAnswer}</strong>
                   </span>
-                  <span style={{
-                    color: result.isCorrect ? "#28a745" : "#dc3545",
-                    fontWeight: "600"
-                  }}>
+                  <span
+                    style={{
+                      color: result.isCorrect ? "#28a745" : "#dc3545",
+                      fontWeight: "600",
+                    }}
+                  >
                     {result.isCorrect ? "✓ Correct" : "✗ Incorrect"}
                   </span>
                 </div>
                 {!result.isCorrect && (
-                  <p style={{
-                    marginTop: "8px",
-                    color: "#28a745",
-                    fontSize: "0.9rem"
-                  }}>
+                  <p
+                    style={{
+                      marginTop: "8px",
+                      color: "#28a745",
+                      fontSize: "0.9rem",
+                    }}
+                  >
                     Correct Answer: <strong>{result.correctAnswer}</strong>
                   </p>
                 )}
@@ -378,12 +403,14 @@ export default function StudentPage() {
                 </div>
               ) : (
                 <div style={{ textAlign: "center", marginTop: "30px" }}>
-                  <div style={{
-                    background: "#f8f9fa",
-                    borderRadius: "15px",
-                    padding: "25px",
-                    marginBottom: "30px"
-                  }}>
+                  <div
+                    style={{
+                      background: "#f8f9fa",
+                      borderRadius: "15px",
+                      padding: "25px",
+                      marginBottom: "30px",
+                    }}
+                  >
                     <h3 style={{ color: "#2c3e50", marginBottom: "15px" }}>
                       Quiz Information
                     </h3>
@@ -406,12 +433,16 @@ export default function StudentPage() {
             </div>
           </div>
         ) : (
-          <div style={{
-            textAlign: "center",
-            padding: "60px 20px",
-            color: "#6c757d"
-          }}>
-            <div style={{ fontSize: "4rem", marginBottom: "20px", opacity: "0.5" }}>
+          <div
+            style={{
+              textAlign: "center",
+              padding: "60px 20px",
+              color: "#6c757d",
+            }}
+          >
+            <div
+              style={{ fontSize: "4rem", marginBottom: "20px", opacity: "0.5" }}
+            >
               👨‍🏫
             </div>
             <h2 style={{ color: "#2c3e50", marginBottom: "15px" }}>

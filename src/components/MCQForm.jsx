@@ -66,17 +66,14 @@ export default function MCQForm({ onMCQAdded }) {
       if (response.ok) {
         setSuccess("MCQ added successfully! 🎉");
 
-        // Call the callback to update the parent component
         if (onMCQAdded && data.mcq) {
           onMCQAdded(data.mcq);
         }
 
-        // Reset form
         setQuestion("");
         setOptions(["", "", "", ""]);
         setCorrectIndex(null);
 
-        // Clear success message after 3 seconds
         setTimeout(() => setSuccess(""), 3000);
       } else {
         setError(data.msg || "Failed to submit MCQ");
@@ -128,33 +125,39 @@ export default function MCQForm({ onMCQAdded }) {
         <label className="form-label">Options</label>
         {options.map((opt, idx) => (
           <div key={idx} style={{ marginBottom: "20px" }}>
-            <div style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              marginBottom: "8px"
-            }}>
-              <div style={{
-                width: "35px",
-                height: "35px",
-                borderRadius: "50%",
-                background: "#1e3c72",
-                color: "white",
+            <div
+              style={{
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "center",
-                fontWeight: "bold",
-                fontSize: "1rem",
-                flexShrink: 0
-              }}>
+                gap: "12px",
+                marginBottom: "8px",
+              }}
+            >
+              <div
+                style={{
+                  width: "35px",
+                  height: "35px",
+                  borderRadius: "50%",
+                  background: "#1e3c72",
+                  color: "white",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontWeight: "bold",
+                  fontSize: "1rem",
+                  flexShrink: 0,
+                }}
+              >
                 {idx + 1}
               </div>
-              <span style={{
-                fontSize: "1rem",
-                color: "#6b7280",
-                fontWeight: "500",
-                minWidth: "80px"
-              }}>
+              <span
+                style={{
+                  fontSize: "1rem",
+                  color: "#6b7280",
+                  fontWeight: "500",
+                  minWidth: "80px",
+                }}
+              >
                 Option {idx + 1}
               </span>
             </div>
@@ -167,12 +170,14 @@ export default function MCQForm({ onMCQAdded }) {
               required
               style={{ marginBottom: "8px" }}
             />
-            <div style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              marginLeft: "47px"
-            }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                marginLeft: "47px",
+              }}
+            >
               <input
                 type="radio"
                 name="correctAnswer"
@@ -182,14 +187,16 @@ export default function MCQForm({ onMCQAdded }) {
                   width: "18px",
                   height: "18px",
                   cursor: "pointer",
-                  accentColor: "#1e3c72"
+                  accentColor: "#1e3c72",
                 }}
               />
-              <span style={{
-                fontSize: "0.95rem",
-                color: correctIndex === idx ? "#10b981" : "#6b7280",
-                fontWeight: correctIndex === idx ? "600" : "400"
-              }}>
+              <span
+                style={{
+                  fontSize: "0.95rem",
+                  color: correctIndex === idx ? "#10b981" : "#6b7280",
+                  fontWeight: correctIndex === idx ? "600" : "400",
+                }}
+              >
                 {correctIndex === idx ? "✓ Correct Answer" : "Mark as correct"}
               </span>
             </div>
@@ -204,13 +211,13 @@ export default function MCQForm({ onMCQAdded }) {
           disabled={isSubmitting}
           style={{
             opacity: isSubmitting ? 0.7 : 1,
-            flex: 1
+            flex: 1,
           }}
         >
           {isSubmitting ? "Adding MCQ..." : "➕ Add MCQ"}
         </button>
 
-        <button
+        {/* <button
           type="button"
           className="btn btn-cancel"
           onClick={resetForm}
@@ -218,7 +225,7 @@ export default function MCQForm({ onMCQAdded }) {
           style={{ minWidth: "100px" }}
         >
           🔄 Reset
-        </button>
+        </button> */}
       </div>
     </form>
   );

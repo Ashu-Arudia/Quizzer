@@ -46,7 +46,6 @@ export default function LoginForm() {
           localStorage.setItem("token", data.token);
           localStorage.setItem("role", data.user.role);
 
-          // Show success message briefly before redirect
           setTimeout(() => {
             if (data.user.role === "teacher") {
               navigate("/admin");
@@ -90,7 +89,9 @@ export default function LoginForm() {
     <div className="login-form">
       <div className="form-header">
         <h2>{isLogin ? "Welcome Back" : "Create Account"}</h2>
-        <p>{isLogin ? "Sign in to your account" : "Join our learning platform"}</p>
+        <p>
+          {isLogin ? "Sign in to your account" : "Join our learning platform"}
+        </p>
       </div>
 
       {error && (
@@ -166,11 +167,7 @@ export default function LoginForm() {
           </>
         )}
 
-        <button
-          type="submit"
-          className="btn-submit"
-          disabled={isLoading}
-        >
+        <button type="submit" className="btn-submit" disabled={isLoading}>
           {isLoading ? (
             <>
               <span className="loading-spinner"></span>
@@ -178,9 +175,7 @@ export default function LoginForm() {
             </>
           ) : (
             <>
-              <span className="btn-icon">
-                {isLogin ? "🚀" : "✨"}
-              </span>
+              <span className="btn-icon">{isLogin ? "" : "✨"}</span>
               {isLogin ? "Sign In" : "Create Account"}
             </>
           )}

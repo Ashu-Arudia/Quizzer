@@ -1,11 +1,9 @@
-// src/pages/LoginPage.jsx
-import LoginForm from '../components/LoginForm';
-import './LoginPage.css';
+import LoginForm from "../components/LoginForm";
+import "./LoginPage.css";
 
 export default function LoginPage() {
   return (
     <div className="login-page">
-      {/* Left Side - Branding */}
       <div className="login-branding">
         <div className="branding-content">
           <div className="brand-logo">
@@ -14,7 +12,10 @@ export default function LoginPage() {
           </div>
           <div className="brand-description">
             <h2>Welcome to the Future of Learning</h2>
-            <p>Create, manage, and take interactive quizzes with our comprehensive MCQ platform designed for educators and students.</p>
+            <p>
+              Create, manage, and take interactive quizzes with our
+              comprehensive MCQ platform designed for educators and students.
+            </p>
           </div>
           <div className="brand-features">
             <div className="feature-item">
@@ -33,7 +34,6 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Right Side - Login Form */}
       <div className="login-form-container">
         <div className="form-wrapper">
           <LoginForm />

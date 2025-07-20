@@ -12,7 +12,6 @@ router.post(
   async (req, res) => {
     const { question, options, correctAnswer } = req.body;
 
-    // ✅ Validate data server-side
     if (
       !question ||
       !options ||
@@ -34,7 +33,7 @@ router.post(
       const mcq = new MCQ({
         question,
         options,
-        correctAnswer, // This is the correct *option text*
+        correctAnswer,
         createdBy: req.user.id,
       });
 
@@ -90,11 +89,13 @@ router.delete(
 
       const mcq = await MCQ.findOneAndDelete({
         _id: req.params.id,
-        createdBy: req.user.id
+        createdBy: req.user.id,
       });
 
       if (!mcq) {
-        return res.status(404).json({ error: "MCQ not found or access denied" });
+        return res
+          .status(404)
+          .json({ error: "MCQ not found or access denied" });
       }
 
       console.log("MCQ deleted successfully");
