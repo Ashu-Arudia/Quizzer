@@ -3,7 +3,7 @@
   min-height: calc(100vh - 80px); /* Account for header height */
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   padding: 30px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .admin-content {
@@ -109,8 +109,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Empty State */
@@ -141,7 +145,7 @@
 .mcq-grid {
   display: grid;
   gap: 20px;
-  max-height: 500px;
+  max-height: 750px;
   overflow-y: auto;
   padding-right: 10px;
 }
