@@ -1,5 +1,6 @@
+require('dotenv').config();
 const jwt = require("jsonwebtoken");
-const SECRET_KEY = process.env.SECRET_KEY;
+const SECRET_KEY = process.env.JWT_SECRET;
 
 function authenticateToken(req, res, next) {
   const authHeader = req.header("Authorization");
@@ -11,11 +12,17 @@ function authenticateToken(req, res, next) {
   const token = authHeader.split(" ")[1];
 
   try {
-    console.log("chal gya");
+    console.log("Token received, attempting to verify...");
+    console.log("SECRET_KEY value:", SECRET_KEY ? "Present" : "Missing");
     const decoded = jwt.verify(token, SECRET_KEY);
+    console.log("Token decoded successfully:", decoded);
+    console.log("User role:", decoded.role);
+    console.log("User ID:", decoded.id);
+
     req.user = decoded; // Attach decoded token payload (user info) to request
     next(); // Pass control to next middleware or route handler
   } catch (err) {
+    console.error("Token verification failed:", err.message);
     res.status(403).json({ error: "Invalid or expired token" });
   }
 }

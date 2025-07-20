@@ -10,11 +10,20 @@ export default function AdminPage() {
     console.log("useEffect started");
 
     const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+
     console.log("Token from localStorage:", token);
+    console.log("Role from localStorage:", role);
 
     if (!token) {
       console.warn("No token found; setting error");
       setError("You must be logged in to view your MCQs.");
+      return;
+    }
+
+    if (role !== "teacher") {
+      console.warn("User is not a teacher; setting error");
+      setError(`Access denied: You are logged in as a ${role}, but only teachers can view MCQs.`);
       return;
     }
 
@@ -28,12 +37,21 @@ export default function AdminPage() {
       },
     })
       .then((res) => {
+        console.log("Response status:", res.status);
+        console.log("Response headers:", res.headers);
+
         if (!res.ok) {
-          throw new Error("Failed to fetch MCQs");
+          return res.json().then(errorData => {
+            console.error("Server error response:", errorData);
+            throw new Error(errorData.error || "Failed to fetch MCQs");
+          });
         }
         return res.json();
       })
-      .then((data) => setMcqs(data))
+      .then((data) => {
+        console.log("MCQs data received:", data);
+        setMcqs(data);
+      })
       .catch((err) => {
         console.error("Fetch error:", err);
         setError(err.message);
