@@ -7,13 +7,18 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [role, setRole] = useState("student");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setIsLoading(true);
 
     if (!isLogin && password !== confirmPassword) {
-      alert("Passwords do not match.");
+      setError("Passwords do not match.");
+      setIsLoading(false);
       return;
     }
 
@@ -41,93 +46,160 @@ export default function LoginForm() {
           localStorage.setItem("token", data.token);
           localStorage.setItem("role", data.user.role);
 
-          alert("Login successful!");
-          if (data.user.role === "teacher") {
-            navigate("/admin");
-          } else if (data.user.role === "student") {
-            navigate("/student");
-          } else {
-            alert("Unknown role, cannot redirect.");
-          }
+          // Show success message briefly before redirect
+          setTimeout(() => {
+            if (data.user.role === "teacher") {
+              navigate("/admin");
+            } else if (data.user.role === "student") {
+              navigate("/student");
+            } else {
+              setError("Unknown role, cannot redirect.");
+            }
+          }, 1000);
         } else {
-          alert("Registration successful! Now log in.");
-          setIsLogin(true);
+          setError("Registration successful! Please log in.");
+          setTimeout(() => {
+            setIsLogin(true);
+            setError("");
+          }, 2000);
         }
       } else {
-        alert(data.msg || "Something went wrong");
+        setError(data.msg || "Something went wrong");
       }
     } catch (error) {
       console.error("Error:", error);
-      alert("Error. Try again.");
+      setError("Network error. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  return (
-    <div>
-      <form onSubmit={handleSubmit}>
-        <h2>{isLogin ? "Login" : "Sign Up"}</h2>
-        <input
-          type="text"
-          placeholder="Email"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-        />
-        <br />
-        <br />
+  const resetForm = () => {
+    setUsername("");
+    setPassword("");
+    setConfirmPassword("");
+    setError("");
+  };
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <br />
-        <br />
+  const toggleMode = () => {
+    setIsLogin(!isLogin);
+    resetForm();
+  };
+
+  return (
+    <div className="login-form">
+      <div className="form-header">
+        <h2>{isLogin ? "Welcome Back" : "Create Account"}</h2>
+        <p>{isLogin ? "Sign in to your account" : "Join our learning platform"}</p>
+      </div>
+
+      {error && (
+        <div className="form-message form-error">
+          <span className="message-icon">⚠️</span>
+          {error}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="auth-form">
+        <div className="form-group">
+          <label className="form-label">Email Address</label>
+          <div className="input-wrapper">
+            <span className="input-icon">📧</span>
+            <input
+              type="email"
+              className="form-input"
+              placeholder="Enter your email"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Password</label>
+          <div className="input-wrapper">
+            <span className="input-icon">🔒</span>
+            <input
+              type="password"
+              className="form-input"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+        </div>
 
         {!isLogin && (
           <>
-            <input
-              type="password"
-              placeholder="Confirm Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
-            <br />
-            <br />
+            <div className="form-group">
+              <label className="form-label">Confirm Password</label>
+              <div className="input-wrapper">
+                <span className="input-icon">🔒</span>
+                <input
+                  type="password"
+                  className="form-input"
+                  placeholder="Confirm your password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
 
-            <label>
-              Select Role: &nbsp;
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                required
-              >
-                <option value="student">Student</option>
-                <option value="teacher">Teacher</option>
-              </select>
-            </label>
-            <br />
-            <br />
+            <div className="form-group">
+              <label className="form-label">Select Role</label>
+              <div className="input-wrapper">
+                <span className="input-icon">👤</span>
+                <select
+                  className="form-select"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  required
+                >
+                  <option value="student">Student</option>
+                  <option value="teacher">Teacher</option>
+                </select>
+              </div>
+            </div>
           </>
         )}
 
-        <button type="submit">{isLogin ? "Login" : "Sign Up"}</button>
+        <button
+          type="submit"
+          className="btn-submit"
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <>
+              <span className="loading-spinner"></span>
+              {isLogin ? "Signing In..." : "Creating Account..."}
+            </>
+          ) : (
+            <>
+              <span className="btn-icon">
+                {isLogin ? "🚀" : "✨"}
+              </span>
+              {isLogin ? "Sign In" : "Create Account"}
+            </>
+          )}
+        </button>
       </form>
 
-      <br />
-      <p>
-        {isLogin ? "Don't have an account?" : "Already have an account?"}
-        &nbsp;
+      <div className="form-footer">
+        <p className="toggle-text">
+          {isLogin ? "Don't have an account?" : "Already have an account?"}
+        </p>
         <button
-          onClick={() => setIsLogin(!isLogin)}
-          style={{ cursor: "pointer" }}
+          type="button"
+          className="btn-toggle"
+          onClick={toggleMode}
+          disabled={isLoading}
         >
-          {isLogin ? "Sign Up" : "Login"}
+          {isLogin ? "Create Account" : "Sign In"}
         </button>
-      </p>
+      </div>
     </div>
   );
 }
