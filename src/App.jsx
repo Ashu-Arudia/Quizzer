@@ -1,8 +1,9 @@
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import "./App.css";
-import Header from "./components/Header";
+import Footer from "./components/footer";
 import ProtectedRoute from "./components/protectedroute";
 import AdminPage from "./pages/AdminPage";
+import Login from "./pages/Login";
 import LoginPage from "./pages/LoginPage";
 import StudentPage from "./pages/StudentPage";
 
@@ -10,13 +11,12 @@ function App() {
   return (
     <Router>
       <div className="app">
-        <Header />
         <main className="app-main">
           <Routes>
             <Route path="/" element={<LoginPage />} />
-
+            <Route path="/login" element={<Login />} />
             <Route
-              path="/admin"
+              path="/teacher"
               element={
                 <ProtectedRoute allowedRoles={["teacher"]}>
                   <AdminPage />
@@ -34,6 +34,7 @@ function App() {
             />
           </Routes>
         </main>
+        <Footer />
       </div>
     </Router>
   );

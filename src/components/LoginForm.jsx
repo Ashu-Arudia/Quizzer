@@ -48,7 +48,7 @@ export default function LoginForm() {
 
           setTimeout(() => {
             if (data.user.role === "teacher") {
-              navigate("/admin");
+              navigate("/teacher");
             } else if (data.user.role === "student") {
               navigate("/student");
             } else {
@@ -94,18 +94,12 @@ export default function LoginForm() {
         </p>
       </div>
 
-      {error && (
-        <div className="form-message form-error">
-          <span className="message-icon">⚠️</span>
-          {error}
-        </div>
-      )}
+      {error && <div className="form-message form-error">{error}</div>}
 
       <form onSubmit={handleSubmit} className="auth-form">
         <div className="form-group">
           <label className="form-label">Email Address</label>
           <div className="input-wrapper">
-            <span className="input-icon">📧</span>
             <input
               type="email"
               className="form-input"
@@ -120,7 +114,6 @@ export default function LoginForm() {
         <div className="form-group">
           <label className="form-label">Password</label>
           <div className="input-wrapper">
-            <span className="input-icon">🔒</span>
             <input
               type="password"
               className="form-input"
@@ -137,7 +130,6 @@ export default function LoginForm() {
             <div className="form-group">
               <label className="form-label">Confirm Password</label>
               <div className="input-wrapper">
-                <span className="input-icon">🔒</span>
                 <input
                   type="password"
                   className="form-input"
@@ -152,7 +144,6 @@ export default function LoginForm() {
             <div className="form-group">
               <label className="form-label">Select Role</label>
               <div className="input-wrapper">
-                <span className="input-icon">👤</span>
                 <select
                   className="form-select"
                   value={role}
