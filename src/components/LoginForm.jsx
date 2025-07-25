@@ -48,7 +48,7 @@ export default function LoginForm() {
 
           setTimeout(() => {
             if (data.user.role === "teacher") {
-              navigate("/teacher");
+              navigate("/teacher0");
             } else if (data.user.role === "student") {
               navigate("/student");
             } else {
@@ -86,105 +86,188 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="login-form">
-      <div className="form-header">
-        <h2>{isLogin ? "Welcome Back" : "Create Account"}</h2>
-        <p>
-          {isLogin ? "Sign in to your account" : "Join our learning platform"}
-        </p>
-      </div>
+    <div
+      style={{
+        backgroundColor: "white",
+        color: "#fff",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: "#111",
+          padding: "40px",
+          borderRadius: "8px",
+          width: "100%",
+          maxWidth: "600px",
+          height: "100%",
+          maxHeight: "600px",
+          boxShadow: "0 0 10px rgba(255, 255, 255, 0.1)",
+        }}
+      >
+        <div style={{ marginBottom: "20px", textAlign: "center" }}>
+          <h2 style={{ margin: "0", fontWeight: "bold" }}>
+            {isLogin ? "Welcome Back" : "Create Account"}
+          </h2>
+          <p style={{ marginTop: "10px", color: "#ccc" }}>
+            {isLogin ? "Sign in to your account" : "Join our learning platform"}
+          </p>
+        </div>
 
-      {error && <div className="form-message form-error">{error}</div>}
+        {error && (
+          <div
+            style={{
+              backgroundColor: "#ff4444",
+              padding: "10px",
+              borderRadius: "4px",
+              marginBottom: "20px",
+              color: "#fff",
+              textAlign: "center",
+            }}
+          >
+            {error}
+          </div>
+        )}
 
-      <form onSubmit={handleSubmit} className="auth-form">
-        <div className="form-group">
-          <label className="form-label">Email Address</label>
-          <div className="input-wrapper">
+        <form onSubmit={handleSubmit}>
+          <div style={{ marginBottom: "15px" }}>
+            <label style={{ display: "block", marginBottom: "5px" }}>
+              Email Address
+            </label>
             <input
               type="email"
-              className="form-input"
-              placeholder="Enter your email"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
+              style={{
+                width: "100%",
+                padding: "10px",
+                borderRadius: "4px",
+                border: "1px solid #444",
+                backgroundColor: "#222",
+                color: "#fff",
+              }}
+              placeholder="you@example.com"
             />
           </div>
-        </div>
 
-        <div className="form-group">
-          <label className="form-label">Password</label>
-          <div className="input-wrapper">
+          <div style={{ marginBottom: "15px" }}>
+            <label style={{ display: "block", marginBottom: "5px" }}>
+              Password
+            </label>
             <input
               type="password"
-              className="form-input"
-              placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              style={{
+                width: "100%",
+                padding: "10px",
+                borderRadius: "4px",
+                border: "1px solid #444",
+                backgroundColor: "#222",
+                color: "#fff",
+              }}
+              placeholder="••••••••"
             />
           </div>
-        </div>
 
-        {!isLogin && (
-          <>
-            <div className="form-group">
-              <label className="form-label">Confirm Password</label>
-              <div className="input-wrapper">
+          {!isLogin && (
+            <>
+              <div style={{ marginBottom: "15px" }}>
+                <label style={{ display: "block", marginBottom: "5px" }}>
+                  Confirm Password
+                </label>
                 <input
                   type="password"
-                  className="form-input"
-                  placeholder="Confirm your password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
+                  style={{
+                    width: "100%",
+                    padding: "10px",
+                    borderRadius: "4px",
+                    border: "1px solid #444",
+                    backgroundColor: "#222",
+                    color: "#fff",
+                  }}
+                  placeholder="Repeat password"
                 />
               </div>
-            </div>
 
-            <div className="form-group">
-              <label className="form-label">Select Role</label>
-              <div className="input-wrapper">
+              <div style={{ marginBottom: "20px" }}>
+                <label style={{ display: "block", marginBottom: "5px" }}>
+                  Role
+                </label>
                 <select
-                  className="form-select"
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
                   required
+                  style={{
+                    width: "100%",
+                    padding: "10px",
+                    borderRadius: "4px",
+                    border: "1px solid #444",
+                    backgroundColor: "#222",
+                    color: "#fff",
+                  }}
                 >
                   <option value="student">Student</option>
                   <option value="teacher">Teacher</option>
                 </select>
               </div>
-            </div>
-          </>
-        )}
-
-        <button type="submit" className="btn-submit" disabled={isLoading}>
-          {isLoading ? (
-            <>
-              <span className="loading-spinner"></span>
-              {isLogin ? "Signing In..." : "Creating Account..."}
-            </>
-          ) : (
-            <>
-              <span className="btn-icon">{isLogin ? "" : "✨"}</span>
-              {isLogin ? "Sign In" : "Create Account"}
             </>
           )}
-        </button>
-      </form>
 
-      <div className="form-footer">
-        <p className="toggle-text">
-          {isLogin ? "Don't have an account?" : "Already have an account?"}
-        </p>
-        <button
-          type="button"
-          className="btn-toggle"
-          onClick={toggleMode}
-          disabled={isLoading}
-        >
-          {isLogin ? "Create Account" : "Sign In"}
-        </button>
+          <button
+            type="submit"
+            disabled={isLoading}
+            style={{
+              width: "100%",
+              padding: "12px",
+              backgroundColor: "#fff",
+              color: "#000",
+              border: "none",
+              borderRadius: "4px",
+              fontWeight: "bold",
+              cursor: "pointer",
+              marginTop: "10px",
+            }}
+          >
+            {isLoading
+              ? isLogin
+                ? "Signing In..."
+                : "Creating Account..."
+              : isLogin
+              ? "Sign In"
+              : "Create Account"}
+          </button>
+        </form>
+
+        <div style={{ marginTop: "20px", textAlign: "center" }}>
+          <p style={{ color: "#aaa" }}>
+            {isLogin ? "Don't have an account?" : "Already have an account?"}
+          </p>
+          <button
+            type="button"
+            onClick={toggleMode}
+            disabled={isLoading}
+            style={{
+              background: "none",
+              border: "none",
+              color: "#fff",
+              textDecoration: "underline",
+              cursor: "pointer",
+              marginTop: "5px",
+            }}
+          >
+            {isLogin ? "Create Account" : "Sign In"}
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -3,6 +3,7 @@ import "./App.css";
 import Footer from "./components/footer";
 import ProtectedRoute from "./components/protectedroute";
 import AdminPage from "./pages/AdminPage";
+import AdminPage0 from "./pages/AdminPage0";
 import Login from "./pages/Login";
 import LoginPage from "./pages/LoginPage";
 import StudentPage from "./pages/StudentPage";
@@ -20,6 +21,14 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={["teacher"]}>
                   <AdminPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/teacher0"
+              element={
+                <ProtectedRoute allowedRoles={["teacher"]}>
+                  <AdminPage0 />
                 </ProtectedRoute>
               }
             />

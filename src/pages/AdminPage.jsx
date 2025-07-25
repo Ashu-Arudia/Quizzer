@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
+import Header from "../components/Header";
 import MCQForm from "../components/MCQForm";
-import "./AdminPage.css";
+// import "./AdminPage.css";
 
 export default function AdminPage() {
   const [mcqs, setMcqs] = useState([]);
@@ -107,102 +108,105 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="admin-container">
-      <div className="admin-content">
-        <div className="admin-header">
-          <h1>MCQ Management Portal</h1>
-          <p>Create, manage, and organize your multiple choice questions</p>
-        </div>
-
-        <div className="admin-body">
-          {/* MCQ Form Section */}
-          <div className="mcq-form-section">
-            <h2 className="section-title">Add New MCQ</h2>
-            <MCQForm onMCQAdded={(newMCQ) => setMcqs([...mcqs, newMCQ])} />
+    <>
+      <Header />
+      <div>
+        <div className="admin-content">
+          <div className="admin-header">
+            <h1>Quizzer Admin Handle</h1>
+            <p>Create, manage, and organize your multiple choice questions</p>
           </div>
 
-          {/* MCQ List Section */}
-          <div className="mcq-list-section">
-            <h2 className="section-title">Your MCQs</h2>
+          <div className="admin-body">
+            {/* MCQ Form Section */}
+            <div className="mcq-form-section">
+              <h2 className="section-title">Add New MCQ</h2>
+              <MCQForm onMCQAdded={(newMCQ) => setMcqs([...mcqs, newMCQ])} />
+            </div>
 
-            {error && (
-              <div className="message message-error">
-                <span>⚠️</span>
-                {error}
-              </div>
-            )}
+            {/* MCQ List Section */}
+            <div className="mcq-list-section">
+              <h2 className="section-title">Your MCQs</h2>
 
-            {deleteError && (
-              <div className="message message-error">
-                <span>❌</span>
-                {deleteError}
-              </div>
-            )}
+              {error && (
+                <div className="message message-error">
+                  <span>⚠️</span>
+                  {error}
+                </div>
+              )}
 
-            {editMessage && (
-              <div className="message message-info">
-                <span>ℹ️</span>
-                {editMessage}
-              </div>
-            )}
+              {deleteError && (
+                <div className="message message-error">
+                  <span>❌</span>
+                  {deleteError}
+                </div>
+              )}
 
-            {loading && (
-              <div className="loading">
-                <div className="loading-spinner"></div>
-                <p>Loading your MCQs...</p>
-              </div>
-            )}
+              {editMessage && (
+                <div className="message message-info">
+                  <span>ℹ️</span>
+                  {editMessage}
+                </div>
+              )}
 
-            {!loading && mcqs.length === 0 && !error && (
-              <div className="empty-state">
-                <div className="empty-state-icon">📝</div>
-                <h3>No MCQs Yet</h3>
-                <p>
-                  Start by adding your first multiple choice question above!
-                </p>
-              </div>
-            )}
+              {loading && (
+                <div className="loading">
+                  <div className="loading-spinner"></div>
+                  <p>Loading your MCQs...</p>
+                </div>
+              )}
 
-            {!loading && mcqs.length > 0 && (
-              <div className="mcq-grid">
-                {mcqs.map((mcq, index) => (
-                  <div key={mcq._id || index} className="mcq-card">
-                    <div className="mcq-question">{mcq.question}</div>
+              {!loading && mcqs.length === 0 && !error && (
+                <div className="empty-state">
+                  <div className="empty-state-icon">📝</div>
+                  <h3>No MCQs Yet</h3>
+                  <p>
+                    Start by adding your first multiple choice question above!
+                  </p>
+                </div>
+              )}
 
-                    <ul className="mcq-options">
-                      {mcq.options.map((option, idx) => (
-                        <li
-                          key={idx}
-                          className={
-                            option === mcq.correctAnswer ? "mcq-correct" : ""
-                          }
+              {!loading && mcqs.length > 0 && (
+                <div className="mcq-grid">
+                  {mcqs.map((mcq, index) => (
+                    <div key={mcq._id || index} className="mcq-card">
+                      <div className="mcq-question">{mcq.question}</div>
+
+                      <ul className="mcq-options">
+                        {mcq.options.map((option, idx) => (
+                          <li
+                            key={idx}
+                            className={
+                              option === mcq.correctAnswer ? "mcq-correct" : ""
+                            }
+                          >
+                            {option}
+                          </li>
+                        ))}
+                      </ul>
+
+                      <div className="mcq-actions">
+                        <button
+                          className="btn btn-edit"
+                          onClick={handleEditClick}
                         >
-                          {option}
-                        </li>
-                      ))}
-                    </ul>
-
-                    <div className="mcq-actions">
-                      <button
-                        className="btn btn-edit"
-                        onClick={handleEditClick}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="btn btn-delete"
-                        onClick={() => handleDeleteMCQ(mcq._id)}
-                      >
-                        Delete
-                      </button>
+                          Edit
+                        </button>
+                        <button
+                          className="btn btn-delete"
+                          onClick={() => handleDeleteMCQ(mcq._id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

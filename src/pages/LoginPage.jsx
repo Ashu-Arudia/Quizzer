@@ -1,24 +1,28 @@
 import AOS from "aos";
 import "aos/dist/aos.css";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import AnalysisIcon from "../icons/analytics.png";
 import QuizIcon from "../icons/quiz.png";
 import secureIcon from "../icons/secure.png";
 import toolsIcon from "../icons/tools.png";
-import "./LoginPage.css";
+import styles from "./LoginPage.module.css";
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const featureRef1 = useRef(null);
+  const featureRef2 = useRef(null);
+  const featureRef3 = useRef(null);
+
   const handlelogin = () => {
     navigate("/login");
   };
 
   useEffect(() => {
     AOS.init({
-      duration: 1000, // Animation duration (in ms)
-      once: false, // Whether animation should happen only once
+      duration: 1000,
+      once: false,
     });
   }, []);
 
@@ -26,16 +30,15 @@ export default function LoginPage() {
     const handleScroll = () => {
       const scrollY = window.scrollY;
 
-      // Each layer scrolls at a different rate
-      document.querySelector(".feature-item1").style.transform = `translateY(${
-        -scrollY * 0.6
-      }px)`;
-      document.querySelector(".feature-item2").style.transform = `translateY(${
-        -scrollY * 0.8
-      }px)`;
-      document.querySelector(".feature-item3").style.transform = `translateY(${
-        -scrollY * 1.2
-      }px)`;
+      if (featureRef1.current) {
+        featureRef1.current.style.transform = `translateY(${-scrollY * 0.6}px)`;
+      }
+      if (featureRef2.current) {
+        featureRef2.current.style.transform = `translateY(${-scrollY * 0.8}px)`;
+      }
+      if (featureRef3.current) {
+        featureRef3.current.style.transform = `translateY(${-scrollY * 1.2}px)`;
+      }
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -45,18 +48,17 @@ export default function LoginPage() {
   return (
     <>
       <Header />
-      <div className="login-page">
-        <div className="login-branding">
-          <div className="branding-content">
-            <div className="brand-logo">
+      <div className={styles["login-page"]}>
+        <div className={styles["login-branding"]}>
+          <div className={styles["branding-content"]}>
+            <div className={styles["brand-logo"]}>
               <img
                 src={QuizIcon}
                 alt="Quiz Logo"
                 style={{ width: "200px", height: "auto", padding: "30px" }}
               />
-
               <h1
-                className="brand-title"
+                className={styles["brand-title"]}
                 style={{
                   fontWeight: "bold",
                   color: "#222222",
@@ -67,7 +69,7 @@ export default function LoginPage() {
                 Quizzer
               </h1>
             </div>
-            <div className="brand-description">
+            <div className={styles["brand-description"]}>
               <h2>Welcome to the Future of Learning</h2>
               <p>
                 Create, manage, and take interactive quizzes with our
@@ -79,7 +81,6 @@ export default function LoginPage() {
               style={{
                 marginTop: "100px",
                 zIndex: "20",
-                // backgroundColor: "red",
               }}
             >
               <h1
@@ -95,14 +96,15 @@ export default function LoginPage() {
                 Create Your Own Quizzes Quizzers!!
               </h1>
               <div style={{ display: "flex", justifyContent: "center" }}>
-                <button onClick={handlelogin} className="btng">
+                <button onClick={handlelogin} className={styles["btng"]}>
                   Get Started!
                 </button>
               </div>
             </div>
-            <div className="brand-features">
-              <div className="wrapper">
-                <div className="feature-item1">
+
+            <div className={styles["brand-features"]}>
+              <div className={styles["wrapper"]}>
+                <div ref={featureRef1} className={styles["feature-item1"]}>
                   <img
                     src={toolsIcon}
                     alt="tools"
@@ -110,7 +112,7 @@ export default function LoginPage() {
                   />
                   <span>Smart Assessment Tools</span>
                 </div>
-                <div className="feature-item2">
+                <div ref={featureRef2} className={styles["feature-item2"]}>
                   <img
                     src={AnalysisIcon}
                     alt="Analysis"
@@ -118,7 +120,7 @@ export default function LoginPage() {
                   />
                   <span>Detailed Analytics</span>
                 </div>
-                <div className="feature-item3">
+                <div ref={featureRef3} className={styles["feature-item3"]}>
                   <img
                     src={secureIcon}
                     alt="secure"

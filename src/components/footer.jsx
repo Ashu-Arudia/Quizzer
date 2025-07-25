@@ -8,7 +8,12 @@ import "./footer.css";
 
 export default function footer() {
   return (
-    <footer className="footer" style={{ display: "flex" }}>
+    <footer
+      className="footer"
+      style={{
+        display: "flex",
+      }}
+    >
       <div className="footer-section brand">
         <h2>Quizzer</h2>
         <p>Test your knowledge. Learn more every day.</p>

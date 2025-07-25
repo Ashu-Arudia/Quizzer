@@ -177,7 +177,8 @@
 
 /* Login Form Styles */
 .login-form {
-  width: 100%;
+  width: 50vw;
+  background-color: yellow;
 }
 
 .form-header {
