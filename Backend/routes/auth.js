@@ -1,24 +1,83 @@
 const express = require("express");
+const passport = require("passport");
 const router = express.Router();
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { OAuth2Client } = require("google-auth-library");
+require("dotenv").config();
+
+const client = new OAuth2Client(process.env.CLIENT_ID);
+
+// Google OAuth start
+router.get(
+  "/google",
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+    prompt: "select_account",
+  })
+);
+
+// Google OAuth callback
+router.get(
+  "/google/callback",
+  passport.authenticate("google", { session: false }),
+  (req, res) => {
+    const user = req.user;
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    let redirectUrl;
+    // Redirect to appropriate frontend page
+    if (!user.isProfileComplete) {
+      redirectUrl = `${process.env.URL}/signup?token=${token}`;
+    } else {
+      redirectUrl =
+        user.role === "teacher"
+          ? `${process.env.URL}/teacher0?token=${token}&role=${user.role}`
+          : `${process.env.URL}/student?token=${token}&role=${user.role}`;
+    }
+
+    res.redirect(redirectUrl);
+  }
+);
+
+// Complete Profile POST (after Google signup)
+// router.post("/complete-profile", async (req, res) => {
+//   const { token, age, bio } = req.body;
+
+//   try {
+//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+//     const user = await User.findById(decoded.id);
+//     if (!user) return res.sendStatus(404);
+
+//     user.additionalInfo = { age, bio };
+//     user.isProfileComplete = true;
+//     await user.save();
+
+//     res.json({ message: "Profile updated" });
+//   } catch (err) {
+//     res.status(401).json({ error: "Invalid token" });
+//   }
+// });
 
 // Register
 router.post("/register", async (req, res) => {
-  const { email, password, role } = req.body;
+  const { username, password, role, token } = req.body;
 
   try {
-    const existing = await User.findOne({ email });
-    if (existing) {
-      return res.status(400).json({ msg: "User already exists" });
-    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const UserId = decoded.id;
 
+    const user = await User.findById(UserId);
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ email, password: hashedPassword, role });
 
-    await newUser.save();
-    res.status(201).json({ msg: "User registered successfully" });
+    user.password = hashedPassword;
+    user.username = username;
+    user.role = role;
+    user.isProfileComplete = true;
+    await user.save();
   } catch (err) {
     console.error(err);
     res.status(500).json({ msg: "Server error" });
@@ -27,10 +86,10 @@ router.post("/register", async (req, res) => {
 
 // Login
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  const { username, password } = req.body;
 
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ username });
     if (!user) return res.status(400).json({ msg: "User not found" });
 
     const isMatch = await bcrypt.compare(password, user.password);

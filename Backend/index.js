@@ -3,8 +3,10 @@ const mongoose = require("mongoose");
 const authRoutes = require("./routes/auth");
 const mcqRoutes = require("./routes/mcq");
 const userRoutes = require("./routes/user");
+const passport = require("passport");
 require("dotenv").config();
 const app = express();
+require("./middleware/passport");
 
 //Database
 mongoose
@@ -18,6 +20,7 @@ const cors = require("cors");
 app.use(cors());
 
 //middleware
+app.use(passport.initialize());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

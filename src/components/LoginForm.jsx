@@ -11,6 +11,11 @@ export default function LoginForm() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  // Google login/signup success handler
+  const handleGoogleLogin = () => {
+    window.location.href = "http://localhost:8000/api/auth/google";
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -22,13 +27,9 @@ export default function LoginForm() {
       return;
     }
 
-    const url = isLogin
-      ? "http://localhost:8000/api/auth/login"
-      : "http://localhost:8000/api/auth/register";
+    const url = "http://localhost:8000/api/auth/login";
 
-    const payload = isLogin
-      ? { email: username, password }
-      : { email: username, password, role };
+    const payload = { username, password };
 
     try {
       const response = await fetch(url, {
@@ -42,26 +43,16 @@ export default function LoginForm() {
       const data = await response.json();
 
       if (response.ok) {
-        if (isLogin) {
-          localStorage.setItem("token", data.token);
-          localStorage.setItem("role", data.user.role);
-
-          setTimeout(() => {
-            if (data.user.role === "teacher") {
-              navigate("/teacher0");
-            } else if (data.user.role === "student") {
-              navigate("/student");
-            } else {
-              setError("Unknown role, cannot redirect.");
-            }
-          }, 1000);
-        } else {
-          setError("Registration successful! Please log in.");
-          setTimeout(() => {
-            setIsLogin(true);
-            setError("");
-          }, 2000);
-        }
+        localStorage.setItem("token", data.token);
+        setTimeout(() => {
+          if (data.user.role === "teacher") {
+            navigate("/teacher0");
+          } else if (data.user.role === "student") {
+            navigate("/student");
+          } else {
+            setError("Unknown role, cannot redirect.");
+          }
+        }, 1000);
       } else {
         setError(data.msg || "Something went wrong");
       }
@@ -89,7 +80,6 @@ export default function LoginForm() {
     <div
       style={{
         backgroundColor: "white",
-        color: "#fff",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -104,13 +94,13 @@ export default function LoginForm() {
           borderRadius: "8px",
           width: "100%",
           maxWidth: "600px",
-          height: "100%",
-          maxHeight: "600px",
+          maxHeight: isLogin ? "540px" : "750px",
+          overflowY: "auto",
           boxShadow: "0 0 10px rgba(255, 255, 255, 0.1)",
         }}
       >
         <div style={{ marginBottom: "20px", textAlign: "center" }}>
-          <h2 style={{ margin: "0", fontWeight: "bold" }}>
+          <h2 style={{ margin: "0", fontWeight: "bold", color: "#fff" }}>
             {isLogin ? "Welcome Back" : "Create Account"}
           </h2>
           <p style={{ marginTop: "10px", color: "#ccc" }}>
@@ -135,11 +125,13 @@ export default function LoginForm() {
 
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: "15px" }}>
-            <label style={{ display: "block", marginBottom: "5px" }}>
-              Email Address
+            <label
+              style={{ display: "block", marginBottom: "5px", color: "#fff" }}
+            >
+              {isLogin ? "Email Address" : "Username / Email"}
             </label>
             <input
-              type="email"
+              type={isLogin ? "email" : "text"}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
@@ -151,12 +143,14 @@ export default function LoginForm() {
                 backgroundColor: "#222",
                 color: "#fff",
               }}
-              placeholder="you@example.com"
+              placeholder={isLogin ? "example@gmail.com" : "Username or email"}
             />
           </div>
 
           <div style={{ marginBottom: "15px" }}>
-            <label style={{ display: "block", marginBottom: "5px" }}>
+            <label
+              style={{ display: "block", marginBottom: "5px", color: "#fff" }}
+            >
               Password
             </label>
             <input
@@ -172,14 +166,20 @@ export default function LoginForm() {
                 backgroundColor: "#222",
                 color: "#fff",
               }}
-              placeholder="••••••••"
+              placeholder="Password"
             />
           </div>
 
           {!isLogin && (
             <>
               <div style={{ marginBottom: "15px" }}>
-                <label style={{ display: "block", marginBottom: "5px" }}>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "5px",
+                    color: "#fff",
+                  }}
+                >
                   Confirm Password
                 </label>
                 <input
@@ -200,7 +200,13 @@ export default function LoginForm() {
               </div>
 
               <div style={{ marginBottom: "20px" }}>
-                <label style={{ display: "block", marginBottom: "5px" }}>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "5px",
+                    color: "#fff",
+                  }}
+                >
                   Role
                 </label>
                 <select
@@ -243,30 +249,21 @@ export default function LoginForm() {
                 ? "Signing In..."
                 : "Creating Account..."
               : isLogin
-              ? "Sign In"
+              ? "Log In"
               : "Create Account"}
           </button>
         </form>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          {/* Divider */}
+          <div style={{ margin: "20px 0", textAlign: "center", color: "#999" }}>
+            — OR —
+          </div>
 
-        <div style={{ marginTop: "20px", textAlign: "center" }}>
-          <p style={{ color: "#aaa" }}>
-            {isLogin ? "Don't have an account?" : "Already have an account?"}
-          </p>
-          <button
-            type="button"
-            onClick={toggleMode}
-            disabled={isLoading}
-            style={{
-              background: "none",
-              border: "none",
-              color: "#fff",
-              textDecoration: "underline",
-              cursor: "pointer",
-              marginTop: "5px",
-            }}
-          >
-            {isLogin ? "Create Account" : "Sign In"}
-          </button>
+          {/* Google Login */}
+          <div style={{ textAlign: "center" }}>
+            <h2>Login</h2>
+            <button onClick={handleGoogleLogin}>Sign in with Google</button>
+          </div>
         </div>
       </div>
     </div>
