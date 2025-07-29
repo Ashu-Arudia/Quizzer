@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Header from "../components/Header";
 import "./StudentPage.css";
 
 export default function StudentPage() {
@@ -17,6 +19,34 @@ export default function StudentPage() {
   const [results, setResults] = useState(null);
   const [showResults, setShowResults] = useState(false);
   const [submitError, setSubmitError] = useState("");
+
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tokenFromUrl = params.get("token");
+    const existingToken = localStorage.getItem("token");
+
+    if (tokenFromUrl) {
+      const role = params.get("role");
+      localStorage.setItem("role", role);
+      localStorage.setItem("token", tokenFromUrl);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    const token = tokenFromUrl || existingToken;
+
+    if (!token) {
+      navigate("/login");
+    } else {
+      setLoading(false);
+    }
+  }, [navigate]);
+
+  // if (loading) {
+  //   return <div>Loading dashboard...</div>;
+  // }
 
   useEffect(() => {
     const fetchTeachers = async () => {
@@ -151,7 +181,7 @@ export default function StudentPage() {
             <h1>
               Question {currentQuestionIndex + 1} of {questions.length}
             </h1>
-            <p>Quiz by {selectedTeacher.email}</p>
+            <p>Quiz by {selectedTeacher.username}</p>
           </div>
           <button className="btn-exit-quiz" onClick={exitQuiz}>
             ✕ Exit Quiz
@@ -327,107 +357,110 @@ export default function StudentPage() {
 
   // Default view with sidebar and teacher selection
   return (
-    <div className="student-page">
-      <div className="sidebar">
-        <h2>Teachers</h2>
-        {loadingTeachers && (
-          <div className="loading">
-            <div className="loading-spinner"></div>
-            <p>Loading teachers...</p>
-          </div>
-        )}
-        {error && (
-          <div className="error-message">
-            <p>{error}</p>
-          </div>
-        )}
-        <ul className="teacher-list">
-          {!loadingTeachers && teachers.length === 0 ? (
-            <p>No teachers found.</p>
-          ) : (
-            teachers.map((teacher) => (
-              <li
-                key={teacher._id}
-                className={`teacher-item ${
-                  selectedTeacher?._id === teacher._id ? "selected" : ""
-                }`}
-                onClick={() => handleSelectTeacher(teacher)}
-              >
-                {teacher.email}
-              </li>
-            ))
+    <>
+      <Header />
+      <div className="student-page">
+        <div className="sidebar">
+          <h2>Teachers</h2>
+          {loadingTeachers && (
+            <div className="loading">
+              <div className="loading-spinner"></div>
+              <p>Loading teachers...</p>
+            </div>
           )}
-        </ul>
-      </div>
-      <div className="main-content">
-        {selectedTeacher ? (
-          <div className="quiz-container">
-            <div className="quiz-header">
-              <h1>Quiz by {selectedTeacher.email}</h1>
-              <p>Test your knowledge with these questions</p>
-              {loadingQuestions ? (
-                <div className="loading">
-                  <div className="loading-spinner"></div>
-                  <p>Loading questions...</p>
-                </div>
-              ) : questions.length === 0 ? (
-                <div className="empty-message">
-                  <div className="empty-message-icon">📝</div>
-                  <h3>No Questions Available</h3>
-                  <p>This teacher hasn't added any questions yet.</p>
-                </div>
-              ) : (
-                <div style={{ textAlign: "center", marginTop: 30 }}>
-                  <div
-                    style={{
-                      background: "#f8f9fa",
-                      borderRadius: 15,
-                      padding: 25,
-                      marginBottom: 30,
-                    }}
-                  >
-                    <h3 style={{ color: "#2c3e50", marginBottom: 15 }}>
-                      Quiz Information
-                    </h3>
-                    <p style={{ color: "#6c757d", marginBottom: 10 }}>
-                      <strong>Total Questions:</strong> {questions.length}
-                    </p>
-                    {/* <p style={{ color: "#6c757d" }}>
+          {error && (
+            <div className="error-message">
+              <p>{error}</p>
+            </div>
+          )}
+          <ul className="teacher-list">
+            {!loadingTeachers && teachers.length === 0 ? (
+              <p>No teachers found.</p>
+            ) : (
+              teachers.map((teacher) => (
+                <li
+                  key={teacher._id}
+                  className={`teacher-item ${
+                    selectedTeacher?._id === teacher._id ? "selected" : ""
+                  }`}
+                  onClick={() => handleSelectTeacher(teacher)}
+                >
+                  {teacher.username}
+                </li>
+              ))
+            )}
+          </ul>
+        </div>
+        <div className="main-content">
+          {selectedTeacher ? (
+            <div className="quiz-container">
+              <div className="quiz-header">
+                <h1>Quiz by {selectedTeacher.username}</h1>
+                <p>Test your knowledge with these questions</p>
+                {loadingQuestions ? (
+                  <div className="loading">
+                    <div className="loading-spinner"></div>
+                    <p>Loading questions...</p>
+                  </div>
+                ) : questions.length === 0 ? (
+                  <div className="empty-message">
+                    <div className="empty-message-icon">📝</div>
+                    <h3>No Questions Available</h3>
+                    <p>This teacher hasn't added any questions yet.</p>
+                  </div>
+                ) : (
+                  <div style={{ textAlign: "center", marginTop: 30 }}>
+                    <div
+                      style={{
+                        background: "#f8f9fa",
+                        borderRadius: 15,
+                        padding: 25,
+                        marginBottom: 30,
+                      }}
+                    >
+                      <h3 style={{ color: "#2c3e50", marginBottom: 15 }}>
+                        Quiz Information
+                      </h3>
+                      <p style={{ color: "#6c757d", marginBottom: 10 }}>
+                        <strong>Total Questions:</strong> {questions.length}
+                      </p>
+                      {/* <p style={{ color: "#6c757d" }}>
                       <strong>Time:</strong> No time limit
                     </p> */}
+                    </div>
+                    <button
+                      className="btn btn-primary"
+                      onClick={startQuiz}
+                      style={{ fontSize: "1.2rem", padding: "15px 40px" }}
+                    >
+                      Start Quiz
+                    </button>
                   </div>
-                  <button
-                    className="btn btn-primary"
-                    onClick={startQuiz}
-                    style={{ fontSize: "1.2rem", padding: "15px 40px" }}
-                  >
-                    Start Quiz
-                  </button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
-          </div>
-        ) : (
-          <div
-            style={{
-              textAlign: "center",
-              padding: "60px 20px",
-              color: "black",
-              fontWeight: "bold",
-            }}
-          >
-            <div style={{ fontSize: "4rem", marginBottom: 20 }}>👨‍🏫</div>
-            <h2
-              style={{ color: "black", marginBottom: 15, fontSize: "2.4rem" }}
+          ) : (
+            <div
+              style={{
+                textAlign: "center",
+                padding: "60px 20px",
+                color: "black",
+                fontWeight: "bold",
+              }}
             >
-              Select a Teacher
-            </h2>
-            <p style={{ fontSize: "1.2rem", opacity: 0.7 }}>
-              Choose a teacher from the sidebar to start taking their quiz
-            </p>
-          </div>
-        )}
+              <div style={{ fontSize: "4rem", marginBottom: 20 }}>👨‍🏫</div>
+              <h2
+                style={{ color: "black", marginBottom: 15, fontSize: "2.4rem" }}
+              >
+                Select a Teacher
+              </h2>
+              <p style={{ fontSize: "1.2rem", opacity: 0.7 }}>
+                Choose a teacher from the sidebar to start taking their quiz
+              </p>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

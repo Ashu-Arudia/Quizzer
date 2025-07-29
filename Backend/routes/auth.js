@@ -78,6 +78,7 @@ router.post("/register", async (req, res) => {
     user.role = role;
     user.isProfileComplete = true;
     await user.save();
+    res.status(200).json({ msg: "Account created successfully" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ msg: "Server error" });

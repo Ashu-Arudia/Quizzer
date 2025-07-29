@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Header from "../components/Header";
 
 export default function AdminPage0() {
   const navigate = useNavigate();
@@ -29,8 +30,11 @@ export default function AdminPage0() {
   if (loading) return <div>Loading dashboard...</div>;
 
   return (
-    <div>
-      <h1>Welcome to Teacher Dashboard</h1>
-    </div>
+    <>
+      <Header />
+      <div style={{ minHeight: "80vh" }}>
+        <h1>Welcome to Teacher Dashboard</h1>
+      </div>
+    </>
   );
 }

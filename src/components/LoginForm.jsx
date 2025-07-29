@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function LoginForm() {
   const [isLogin, setIsLogin] = useState(true);
@@ -11,24 +11,22 @@ export default function LoginForm() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // Google login/signup success handler
   const handleGoogleLogin = () => {
     window.location.href = "http://localhost:8000/api/auth/google";
   };
+
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
 
-    if (!isLogin && password !== confirmPassword) {
-      setError("Passwords do not match.");
-      setIsLoading(false);
-      return;
-    }
-
     const url = "http://localhost:8000/api/auth/login";
-
     const payload = { username, password };
 
     try {
@@ -94,144 +92,94 @@ export default function LoginForm() {
           borderRadius: "8px",
           width: "100%",
           maxWidth: "600px",
-          maxHeight: isLogin ? "540px" : "750px",
-          overflowY: "auto",
+          minHeight: "500px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
           boxShadow: "0 0 10px rgba(255, 255, 255, 0.1)",
         }}
       >
-        <div style={{ marginBottom: "20px", textAlign: "center" }}>
-          <h2 style={{ margin: "0", fontWeight: "bold", color: "#fff" }}>
-            {isLogin ? "Welcome Back" : "Create Account"}
-          </h2>
-          <p style={{ marginTop: "10px", color: "#ccc" }}>
-            {isLogin ? "Sign in to your account" : "Join our learning platform"}
-          </p>
-        </div>
-
-        {error && (
-          <div
-            style={{
-              backgroundColor: "#ff4444",
-              padding: "10px",
-              borderRadius: "4px",
-              marginBottom: "20px",
-              color: "#fff",
-              textAlign: "center",
-            }}
-          >
-            {error}
+        {/* Top Section */}
+        <div>
+          <div style={{ marginBottom: "20px", textAlign: "center" }}>
+            <h2 style={{ margin: "0", fontWeight: "bold", color: "#fff" }}>
+              Welcome Back
+            </h2>
+            <p style={{ marginTop: "10px", color: "#ccc" }}>
+              Sign in to your account
+            </p>
           </div>
-        )}
 
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: "15px" }}>
-            <label
-              style={{ display: "block", marginBottom: "5px", color: "#fff" }}
-            >
-              {isLogin ? "Email Address" : "Username / Email"}
-            </label>
-            <input
-              type={isLogin ? "email" : "text"}
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
+          {error && (
+            <div
               style={{
-                width: "100%",
+                backgroundColor: "#ff4444",
                 padding: "10px",
                 borderRadius: "4px",
-                border: "1px solid #444",
-                backgroundColor: "#222",
+                marginBottom: "20px",
                 color: "#fff",
+                textAlign: "center",
               }}
-              placeholder={isLogin ? "example@gmail.com" : "Username or email"}
-            />
-          </div>
-
-          <div style={{ marginBottom: "15px" }}>
-            <label
-              style={{ display: "block", marginBottom: "5px", color: "#fff" }}
             >
-              Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              style={{
-                width: "100%",
-                padding: "10px",
-                borderRadius: "4px",
-                border: "1px solid #444",
-                backgroundColor: "#222",
-                color: "#fff",
-              }}
-              placeholder="Password"
-            />
-          </div>
-
-          {!isLogin && (
-            <>
-              <div style={{ marginBottom: "15px" }}>
-                <label
-                  style={{
-                    display: "block",
-                    marginBottom: "5px",
-                    color: "#fff",
-                  }}
-                >
-                  Confirm Password
-                </label>
-                <input
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    borderRadius: "4px",
-                    border: "1px solid #444",
-                    backgroundColor: "#222",
-                    color: "#fff",
-                  }}
-                  placeholder="Repeat password"
-                />
-              </div>
-
-              <div style={{ marginBottom: "20px" }}>
-                <label
-                  style={{
-                    display: "block",
-                    marginBottom: "5px",
-                    color: "#fff",
-                  }}
-                >
-                  Role
-                </label>
-                <select
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  required
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    borderRadius: "4px",
-                    border: "1px solid #444",
-                    backgroundColor: "#222",
-                    color: "#fff",
-                  }}
-                >
-                  <option value="student">Student</option>
-                  <option value="teacher">Teacher</option>
-                </select>
-              </div>
-            </>
+              {error}
+            </div>
           )}
 
+          <form onSubmit={handleSubmit}>
+            <div style={{ marginBottom: "15px" }}>
+              <label
+                style={{ display: "block", marginBottom: "5px", color: "#fff" }}
+              >
+                Username
+              </label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  borderRadius: "4px",
+                  border: "1px solid #444",
+                  backgroundColor: "#222",
+                  color: "#fff",
+                }}
+                placeholder=""
+              />
+            </div>
+
+            <div style={{ marginBottom: "15px" }}>
+              <label
+                style={{ display: "block", marginBottom: "5px", color: "#fff" }}
+              >
+                Password
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  borderRadius: "4px",
+                  border: "1px solid #444",
+                  backgroundColor: "#222",
+                  color: "#fff",
+                }}
+                placeholder=""
+              />
+            </div>
+          </form>
+        </div>
+
+        {/* Bottom Section */}
+        <div>
           <button
             type="submit"
             disabled={isLoading}
+            onClick={handleSubmit}
             style={{
               width: "100%",
               padding: "12px",
@@ -241,29 +189,41 @@ export default function LoginForm() {
               borderRadius: "4px",
               fontWeight: "bold",
               cursor: "pointer",
-              marginTop: "10px",
+              marginBottom: "10px",
             }}
           >
-            {isLoading
-              ? isLogin
-                ? "Signing In..."
-                : "Creating Account..."
-              : isLogin
-              ? "Log In"
-              : "Create Account"}
+            {isLoading ? "Logging In..." : "Log In"}
           </button>
-        </form>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          {/* Divider */}
-          <div style={{ margin: "20px 0", textAlign: "center", color: "#999" }}>
-            — OR —
-          </div>
 
-          {/* Google Login */}
-          <div style={{ textAlign: "center" }}>
-            <h2>Login</h2>
-            <button onClick={handleGoogleLogin}>Sign in with Google</button>
-          </div>
+          <button
+            onClick={handleGoogleLogin}
+            style={{
+              width: "100%",
+              height: "40px",
+              backgroundColor: "#fff",
+              border: "1px solid #ddd",
+              borderRadius: "4px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              fontSize: "14px",
+              fontWeight: "500",
+              color: "#444",
+              boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
+            }}
+          >
+            <img
+              src="https://developers.google.com/identity/images/g-logo.png"
+              alt="Google logo"
+              style={{
+                width: "18px",
+                height: "18px",
+                marginRight: "10px",
+              }}
+            />
+            Sign in with Google
+          </button>
         </div>
       </div>
     </div>

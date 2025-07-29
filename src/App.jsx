@@ -37,14 +37,7 @@ function App() {
               />
               <Route path="/teacher0" element={<AdminPage0 />} />
 
-              <Route
-                path="/student"
-                element={
-                  <ProtectedRoute allowedRoles={["student"]}>
-                    <StudentPage />
-                  </ProtectedRoute>
-                }
-              />
+              <Route path="/student" element={<StudentPage />} />
             </Routes>
           </main>
           <Footer />
