@@ -92,7 +92,7 @@ export default function LoginForm() {
           borderRadius: "8px",
           width: "100%",
           maxWidth: "600px",
-          minHeight: "500px",
+          minHeight: "530px",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
@@ -101,12 +101,12 @@ export default function LoginForm() {
       >
         {/* Top Section */}
         <div>
-          <div style={{ marginBottom: "20px", textAlign: "center" }}>
+          <div style={{ marginBottom: "30px", textAlign: "center" }}>
             <h2 style={{ margin: "0", fontWeight: "bold", color: "#fff" }}>
               Welcome Back
             </h2>
-            <p style={{ marginTop: "10px", color: "#ccc" }}>
-              Sign in to your account
+            <p style={{ marginTop: "25px", color: "#ccc" }}>
+              Sign in to your Quizzer account!
             </p>
           </div>
 
@@ -128,7 +128,11 @@ export default function LoginForm() {
           <form onSubmit={handleSubmit}>
             <div style={{ marginBottom: "15px" }}>
               <label
-                style={{ display: "block", marginBottom: "5px", color: "#fff" }}
+                style={{
+                  display: "block",
+                  marginBottom: "10px",
+                  color: "#fff",
+                }}
               >
                 Username
               </label>
@@ -144,6 +148,7 @@ export default function LoginForm() {
                   border: "1px solid #444",
                   backgroundColor: "#222",
                   color: "#fff",
+                  marginBottom: "5px",
                 }}
                 placeholder=""
               />
@@ -151,7 +156,11 @@ export default function LoginForm() {
 
             <div style={{ marginBottom: "15px" }}>
               <label
-                style={{ display: "block", marginBottom: "5px", color: "#fff" }}
+                style={{
+                  display: "block",
+                  marginBottom: "10px",
+                  color: "#fff",
+                }}
               >
                 Password
               </label>
@@ -222,7 +231,7 @@ export default function LoginForm() {
                 marginRight: "10px",
               }}
             />
-            Sign in with Google
+            Google
           </button>
         </div>
       </div>
