@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const MCQ = require("../models/Quiz");
+const MCQ = require("../models/Question");
 const authenticateToken = require("../middleware/authmiddleware");
 const authorizeRoles = require("../middleware/authRole");
 
@@ -43,6 +43,23 @@ router.post(
     } catch (err) {
       console.error("MCQ creation error:", err);
       res.status(500).json({ msg: "Server error" });
+    }
+  }
+);
+
+router.get(
+  "/:quizId/questions",
+  authenticateToken,
+  authorizeRoles("teacher"),
+  async (req, res) => {
+    try {
+      const quiz = await Quiz.findById(req.params.quizId);
+      if (!quiz) return res.status(404).json({ msg: "Quiz not found" });
+
+      const questions = await Question.find({ quiz: req.params.quizId });
+      res.json({ title: quiz.title, questions });
+    } catch (err) {
+      res.status(500).json({ msg: "Server error", error: err.message });
     }
   }
 );

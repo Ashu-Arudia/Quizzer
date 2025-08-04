@@ -1,13 +1,16 @@
 function authorizeRoles(...allowedRoles) {
-  return (req, res, next) => {
+  const User = require("../models/user");
+
+  return async (req, res, next) => {
     if (!req.user) {
       console.log("No user object found");
       return res.status(401).json({ error: "User not authenticated" });
     }
+    const user = await User.findById(req.user.id).select("role");
 
-    if (!allowedRoles.includes(req.user.role)) {
+    if (!allowedRoles.includes(user.role)) {
       console.log(
-        `Access denied: User role '${req.user.role}' not in allowed roles:`,
+        `Access denied: User role '${user.role}' not in allowed roles:`,
         allowedRoles
       );
       return res

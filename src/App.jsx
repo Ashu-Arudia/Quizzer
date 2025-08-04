@@ -8,6 +8,8 @@ import AdminPage from "./pages/AdminPage";
 import AdminPage0 from "./pages/AdminPage0";
 import Login from "./pages/Login";
 import LoginPage from "./pages/LoginPage";
+import QuizDetails from "./pages/QuizDetails";
+import Quizform from "./pages/QuizForm";
 import StudentPage from "./pages/StudentPage";
 
 function App() {
@@ -20,7 +22,7 @@ function App() {
               <Route path="/" element={<LoginPage />} />
               <Route path="/login" element={<Login />} />
               <Route
-                path="/teacher"
+                path="/teacher/create-quiz"
                 element={
                   <ProtectedRoute allowedRoles={["teacher"]}>
                     <AdminPage />
@@ -36,8 +38,9 @@ function App() {
                 }
               />
               <Route path="/teacher0" element={<AdminPage0 />} />
-
+              <Route path="/teacher/quiz/:Id" element={<QuizDetails />} />
               <Route path="/student" element={<StudentPage />} />
+              <Route path="/teacher/quizform" element={<Quizform />} />
             </Routes>
           </main>
           <Footer />

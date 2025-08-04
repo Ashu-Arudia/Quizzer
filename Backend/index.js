@@ -4,6 +4,7 @@ const authRoutes = require("./routes/auth");
 const mcqRoutes = require("./routes/mcq");
 const userRoutes = require("./routes/user");
 const passport = require("passport");
+const quizRoutes = require("./routes/quiz");
 require("dotenv").config();
 const app = express();
 require("./middleware/passport");
@@ -28,5 +29,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/auth", authRoutes);
 app.use("/api/mcq", mcqRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/quizzes", quizRoutes);
 
 app.listen(process.env.PORT, () => console.log("Server started!!"));

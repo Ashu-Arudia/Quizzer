@@ -16,9 +16,6 @@ export default function AdminPage() {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
 
-    console.log("Token from localStorage:", token);
-    console.log("Role from localStorage:", role);
-
     if (!token) {
       console.warn("No token found; setting error");
       setError("You must be logged in to view your MCQs.");

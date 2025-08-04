@@ -25,7 +25,7 @@ router.get(
   (req, res) => {
     const user = req.user;
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
+      expiresIn: "7d",
     });
 
     let redirectUrl;
@@ -42,25 +42,6 @@ router.get(
     res.redirect(redirectUrl);
   }
 );
-
-// Complete Profile POST (after Google signup)
-// router.post("/complete-profile", async (req, res) => {
-//   const { token, age, bio } = req.body;
-
-//   try {
-//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-//     const user = await User.findById(decoded.id);
-//     if (!user) return res.sendStatus(404);
-
-//     user.additionalInfo = { age, bio };
-//     user.isProfileComplete = true;
-//     await user.save();
-
-//     res.json({ message: "Profile updated" });
-//   } catch (err) {
-//     res.status(401).json({ error: "Invalid token" });
-//   }
-// });
 
 // Register
 router.post("/register", async (req, res) => {
@@ -96,11 +77,9 @@ router.post("/login", async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ msg: "Invalid credentials" });
 
-    const token = jwt.sign(
-      { id: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
-    );
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
 
     res.json({
       token,
