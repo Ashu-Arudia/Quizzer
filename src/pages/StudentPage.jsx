@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
+import Teacher from "../icons/teacher.png";
 import "./StudentPage.css";
 
 export default function StudentPage() {
   const [teachers, setTeachers] = useState([]);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
+  const [quizzes, setQuizzes] = useState([]);
   const [questions, setQuestions] = useState([]);
+  const [loadingQuizzes, setLoadingQuizzes] = useState(false);
   const [loadingQuestions, setLoadingQuestions] = useState(false);
   const [loadingTeachers, setLoadingTeachers] = useState(true);
   const [error, setError] = useState("");
 
-  // Quiz state
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [quizStarted, setQuizStarted] = useState(false);
@@ -44,9 +46,7 @@ export default function StudentPage() {
     }
   }, [navigate]);
 
-  // if (loading) {
-  //   return <div>Loading dashboard...</div>;
-  // }
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchTeachers = async () => {
@@ -71,22 +71,58 @@ export default function StudentPage() {
   const handleSelectTeacher = async (teacher) => {
     if (selectedTeacher?._id === teacher._id) {
       setSelectedTeacher(null);
-      setQuestions([]);
-      resetQuiz();
+      setQuizzes([]);
       return;
     }
+
     setSelectedTeacher(teacher);
+    setLoadingQuizzes(true);
+    setQuizzes([]);
+    try {
+      const res = await fetch(`http://localhost:8000/api/user/${teacher._id}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      const data = await res.json();
+      setQuizzes(Array.isArray(data.quizzes) ? data.quizzes : []);
+    } catch (err) {
+      setQuizzes([]);
+      setError("Failed to load quizzes for this teacher.");
+    } finally {
+      setLoadingQuizzes(false);
+    }
+  };
+
+  const handleSelectQuiz = async (quizId) => {
     setLoadingQuestions(true);
+    setError("");
     resetQuiz();
     try {
-      const res = await fetch(`http://localhost:8000/api/mcq/${teacher._id}`);
+      const res = await fetch(
+        `http://localhost:8000/api/user/${quizId}/questions`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
       const data = await res.json();
       setQuestions(Array.isArray(data.questions) ? data.questions : []);
+      if (data.questions && data.questions.length > 0) {
+        setQuizStarted(true);
+      }
     } catch (err) {
       setQuestions([]);
+      setError("Failed to load quiz questions. Please try again.");
     } finally {
       setLoadingQuestions(false);
     }
@@ -100,6 +136,7 @@ export default function StudentPage() {
     setResults(null);
     setShowResults(false);
     setSubmitError("");
+    setQuestions([]);
   };
 
   const startQuiz = () => {
@@ -124,24 +161,15 @@ export default function StudentPage() {
   };
 
   const submitQuiz = () => {
-    const currentQuestion = questions[currentQuestionIndex];
-    const userAnswer = selectedAnswers[currentQuestion._id];
-    if (!userAnswer) {
-      setSubmitError(
-        "Please select an answer for the current question before submitting."
-      );
-      setTimeout(() => setSubmitError(""), 4000);
-      return;
-    }
     let correctAnswers = 0;
     const questionResults = questions.map((question) => {
       const userAnswer = selectedAnswers[question._id];
-      const isCorrect = userAnswer === question.correctAnswer;
+      const isCorrect = userAnswer === question.correct;
       if (isCorrect) correctAnswers++;
       return {
-        question: question.question,
+        question: question.text,
         userAnswer,
-        correctAnswer: question.correctAnswer,
+        correctAnswer: question.correct,
         isCorrect,
         options: question.options,
       };
@@ -154,7 +182,7 @@ export default function StudentPage() {
       totalQuestions,
       percentage,
       questionResults,
-      teacherName: selectedTeacher.email,
+      teacherName: selectedTeacher.username,
     };
     setResults(quizResults);
     setQuizCompleted(true);
@@ -164,6 +192,7 @@ export default function StudentPage() {
   const exitQuiz = () => {
     resetQuiz();
     setSelectedTeacher(null);
+    setQuizzes([]);
     setQuestions([]);
   };
 
@@ -172,7 +201,6 @@ export default function StudentPage() {
     ((currentQuestionIndex + 1) / questions.length) * 100;
   const answeredQuestions = Object.keys(selectedAnswers).length;
 
-  // Fullscreen quiz view
   if (quizStarted && !showResults) {
     return (
       <div className="quiz-fullscreen">
@@ -210,7 +238,7 @@ export default function StudentPage() {
                 {submitError}
               </div>
             )}
-            <p className="question-text">{currentQuestion.question}</p>
+            <p className="question-text">{currentQuestion.text}</p>
             <ul className="mcq-options-fullscreen">
               {currentQuestion.options.map((option, idx) => (
                 <li
@@ -262,7 +290,6 @@ export default function StudentPage() {
     );
   }
 
-  // Fullscreen results view
   if (showResults) {
     return (
       <div className="results-fullscreen">
@@ -355,7 +382,6 @@ export default function StudentPage() {
     );
   }
 
-  // Default view with sidebar and teacher selection
   return (
     <>
       <Header />
@@ -392,54 +418,61 @@ export default function StudentPage() {
           </ul>
         </div>
         <div className="main-content">
-          {selectedTeacher ? (
-            <div className="quiz-container">
-              <div className="quiz-header">
-                <h1>Quiz by {selectedTeacher.username}</h1>
-                <p>Test your knowledge with these questions</p>
-                {loadingQuestions ? (
-                  <div className="loading">
-                    <div className="loading-spinner"></div>
-                    <p>Loading questions...</p>
-                  </div>
-                ) : questions.length === 0 ? (
-                  <div className="empty-message">
-                    <div className="empty-message-icon">📝</div>
-                    <h3>No Questions Available</h3>
-                    <p>This teacher hasn't added any questions yet.</p>
-                  </div>
-                ) : (
-                  <div style={{ textAlign: "center", marginTop: 30 }}>
-                    <div
-                      style={{
-                        background: "#f8f9fa",
-                        borderRadius: 15,
-                        padding: 25,
-                        marginBottom: 30,
-                      }}
-                    >
-                      <h3 style={{ color: "#2c3e50", marginBottom: 15 }}>
-                        Quiz Information
-                      </h3>
-                      <p style={{ color: "#6c757d", marginBottom: 10 }}>
-                        <strong>Total Questions:</strong> {questions.length}
-                      </p>
-                      {/* <p style={{ color: "#6c757d" }}>
-                      <strong>Time:</strong> No time limit
-                    </p> */}
-                    </div>
-                    <button
-                      className="btn btn-primary"
-                      onClick={startQuiz}
-                      style={{ fontSize: "1.2rem", padding: "15px 40px" }}
-                    >
-                      Start Quiz
-                    </button>
-                  </div>
-                )}
+          {selectedTeacher && !quizStarted ? (
+            <div className="quiz-list-container">
+              <div className="quiz-list-header">
+                <h1>Quizzes by {selectedTeacher.username}</h1>
+                <p>Select a quiz to start</p>
               </div>
+              {loadingQuizzes ? (
+                <div className="loading">
+                  <div className="loading-spinner"></div>
+                  <p>Loading quizzes...</p>
+                </div>
+              ) : quizzes.length === 0 ? (
+                <div className="empty-message">
+                  <div className="empty-message-icon">📝</div>
+                  <h3>No Quizzes Available</h3>
+                  <p>This teacher hasn't created any quizzes yet.</p>
+                </div>
+              ) : (
+                <ul className="quizzes-list">
+                  {quizzes.map((quiz) => (
+                    <li
+                      key={quiz._id}
+                      className="quiz-item"
+                      onClick={() => handleSelectQuiz(quiz._id)}
+                    >
+                      <div className="quiz-card-details">
+                        <div className="quiz-card-header">
+                          <h3>{quiz.name}</h3>
+                          {quiz.visibility && (
+                            <span
+                              className={`quiz-visibility ${quiz.visibility.toLowerCase()}`}
+                            >
+                              {quiz.visibility}
+                            </span>
+                          )}
+                        </div>
+                        <div className="quiz-card-meta">
+                          <p>
+                            <span>Difficulty:</span> {quiz.level}
+                          </p>
+                          <p>
+                            <span>Questions:</span> {quiz.questionCount}
+                          </p>
+                          <p>
+                            <span>Time Limit:</span> {quiz.timeLimit} min
+                          </p>
+                        </div>
+                      </div>
+                      <button className="btn-start">Start Test →</button>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
-          ) : (
+          ) : !selectedTeacher ? (
             <div
               style={{
                 textAlign: "center",
@@ -448,17 +481,31 @@ export default function StudentPage() {
                 fontWeight: "bold",
               }}
             >
-              <div style={{ fontSize: "4rem", marginBottom: 20 }}>👨‍🏫</div>
+              <div
+                style={{
+                  fontSize: "4rem",
+                  marginBottom: 20,
+                  width: "80px",
+                  height: "240px",
+                  marginLeft: "32vw",
+                }}
+              >
+                <img
+                  src={Teacher}
+                  alt="teacher"
+                  style={{ objectFit: "cover", width: "100%", height: "100%" }}
+                />
+              </div>
               <h2
                 style={{ color: "black", marginBottom: 15, fontSize: "2.4rem" }}
               >
                 Select a Teacher
               </h2>
               <p style={{ fontSize: "1.2rem", opacity: 0.7 }}>
-                Choose a teacher from the sidebar to start taking their quiz
+                Choose a teacher from the sidebar to view their quizzes
               </p>
             </div>
-          )}
+          ) : null}
         </div>
       </div>
     </>

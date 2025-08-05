@@ -182,6 +182,7 @@ router.get(
     }
   }
 );
+
 router.get(
   "/:quizId",
   authenticateToken,
