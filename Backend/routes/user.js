@@ -15,6 +15,15 @@ router.get("/teachers", async (req, res) => {
   }
 });
 
+router.get("/profile", authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 router.get(
   "/:quizId/questions",
   authenticateToken,

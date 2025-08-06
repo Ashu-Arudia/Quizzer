@@ -3,8 +3,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Account from "../icons/acc.png";
 
 export default function Header() {
-  const [userRole, setUserRole] = useState("");
-  const [userEmail, setUserEmail] = useState("");
+  const [userRole, setUserRole] = useState("N/A");
+  const [userEmail, setUserEmail] = useState("N/A");
+  const [userName, setUserName] = useState("N/A");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
@@ -26,19 +29,39 @@ export default function Header() {
   };
 
   useEffect(() => {
-    const role = localStorage.getItem("role");
-    const token = localStorage.getItem("token");
+    const fetchUserData = async () => {
+      const token = localStorage.getItem("token");
+      if (!token || isAuthPage) {
+        setLoading(false);
+        return;
+      }
 
-    if (role && token) {
-      setUserRole(role);
-      setUserEmail(`${role.charAt(0).toUpperCase() + role.slice(1)} Account`);
-    }
-  }, []);
+      try {
+        const res = await fetch("http://localhost:8000/api/user/profile", {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error("Failed to fetch user data");
+        const data = await res.json();
+        setUserEmail(data.email || "N/A");
+        setUserName(data.username || "N/A");
+        setUserRole(data.role || "N/A");
+      } catch (err) {
+        setError(err.message);
+        setUserEmail("N/A");
+        setUserName("N/A");
+        setUserRole("N/A");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [isAuthPage]);
 
   if (isAuthPage) {
     return (
       <header
-        className="app-header"
         style={{
           position: "sticky",
           top: 0,
@@ -47,7 +70,6 @@ export default function Header() {
         }}
       >
         <div
-          className="header-content"
           style={{
             display: "flex",
             justifyContent: "space-between",
@@ -57,12 +79,11 @@ export default function Header() {
             zIndex: "1000",
           }}
         >
-          <div className="header-brand" style={{ display: "flex" }}>
+          <div style={{ display: "flex" }}>
             <div
-              className="brand-title"
               style={{
                 fontWeight: "bold",
-                fontFamily: "Inter Tight",
+                fontFamily: "Inter Tight, sans-serif",
                 fontSize: "14px",
                 paddingRight: "10px",
               }}
@@ -70,21 +91,19 @@ export default function Header() {
               Quizzer
             </div>
             <div
-              className="brand-title"
               style={{
-                fontFamily: "Inter Tight",
+                fontFamily: "Inter Tight, sans-serif",
                 fontSize: "14px",
                 paddingRight: "10px",
-                fontWeight: "5",
+                fontWeight: "500",
               }}
             >
               by
             </div>
             <div
-              className="brand-title"
               style={{
                 fontWeight: "bold",
-                fontFamily: "Inter Tight",
+                fontFamily: "Inter Tight, sans-serif",
                 fontSize: "14px",
               }}
             >
@@ -101,6 +120,7 @@ export default function Header() {
           >
             <div
               onClick={handleLogin}
+              className="login-button"
               style={{
                 padding: "8px 16px",
                 backgroundColor: "#222222",
@@ -108,10 +128,8 @@ export default function Header() {
                 borderRadius: "4px",
                 cursor: "pointer",
                 fontWeight: "500",
-                transition: "background-color 0.3s",
+                transition: "opacity 0.3s",
               }}
-              onMouseOver={(e) => (e.currentTarget.style.opacity = "0.8")}
-              onMouseOut={(e) => (e.currentTarget.style.opacity = "1")}
             >
               Login
             </div>
@@ -120,8 +138,45 @@ export default function Header() {
       </header>
     );
   }
-  if (!isAuthPage) {
-    return (
+
+  return (
+    <>
+      <style>
+        {`
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+          .login-button:hover {
+            opacity: 0.8;
+          }
+          .login-button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(34, 34, 34, 0.3);
+          }
+          .account-icon:hover {
+            background-color: #f3f4f6;
+          }
+          .account-icon:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
+          }
+          .dropdown-item:hover {
+            background-color: #f3f4f6;
+          }
+          .dropdown-item:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
+          }
+          .logout-button:hover {
+            background-color: #dc2626;
+          }
+          .logout-button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.3);
+          }
+        `}
+      </style>
       <header
         style={{
           width: "100%",
@@ -137,15 +192,11 @@ export default function Header() {
           zIndex: 1000,
         }}
       >
-        <div
-          className="header-brand"
-          style={{ display: "flex", color: "#222222" }}
-        >
+        <div style={{ display: "flex", color: "#222222" }}>
           <div
-            className="brand-title"
             style={{
               fontWeight: "bold",
-              fontFamily: "Inter Tight",
+              fontFamily: "Inter Tight, sans-serif",
               fontSize: "14px",
               paddingRight: "10px",
             }}
@@ -153,21 +204,19 @@ export default function Header() {
             Quizzer
           </div>
           <div
-            className="brand-title"
             style={{
-              fontFamily: "Inter Tight",
+              fontFamily: "Inter Tight, sans-serif",
               fontSize: "14px",
               paddingRight: "10px",
-              fontWeight: "5",
+              fontWeight: "500",
             }}
           >
             by
           </div>
           <div
-            className="brand-title"
             style={{
               fontWeight: "bold",
-              fontFamily: "Inter Tight",
+              fontFamily: "Inter Tight, sans-serif",
               fontSize: "14px",
             }}
           >
@@ -179,75 +228,141 @@ export default function Header() {
         <div style={{ position: "relative" }}>
           <div
             onClick={toggleDropdown}
+            className="account-icon"
             style={{
-              width: "55px",
-              height: "45px",
+              width: "40px",
+              height: "40px",
               cursor: "pointer",
-              padding: "8px 12px",
-              borderRadius: "40px",
+              padding: "8px",
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "background-color 0.3s",
             }}
           >
             <img
               src={Account}
               alt="Account"
-              style={{ width: "100%", height: "100%" }}
+              style={{ width: "100%", height: "100%", borderRadius: "50%" }}
             />
           </div>
 
-          {/* Dropdown */}
+          {/* Dropdown Card */}
           {showDropdown && (
             <div
               style={{
                 position: "absolute",
-                top: "40px",
+                top: "48px",
                 right: 0,
-                backgroundColor: "#fff",
-                color: "#000",
-                borderRadius: "4px",
-                boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
-                overflow: "hidden",
-                minWidth: "150px",
+                backgroundColor: "#ffffff",
+                borderRadius: "8px",
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+                minWidth: "200px",
                 zIndex: 1001,
+                padding: "12px",
+                animation: "fadeIn 0.2s ease-out",
               }}
             >
-              <div
-                onClick={() => {
-                  setShowDropdown(false);
-                  navigate("/account");
-                }}
-                style={{
-                  padding: "10px 15px",
-                  cursor: "pointer",
-                  borderBottom: "1px solid #eee",
-                }}
-                onMouseOut={(e) =>
-                  (e.currentTarget.style.backgroundColor = "white")
-                }
-                onMouseOver={(e) =>
-                  (e.currentTarget.style.backgroundColor = "grey")
-                }
-              >
-                Account
-              </div>
-              <div
-                onClick={handleLogout}
-                style={{
-                  padding: "10px 15px",
-                  cursor: "pointer",
-                }}
-                onMouseOver={(e) =>
-                  (e.currentTarget.style.backgroundColor = "grey")
-                }
-                onMouseOut={(e) =>
-                  (e.currentTarget.style.backgroundColor = "white")
-                }
-              >
-                Logout
-              </div>
+              {loading ? (
+                <div
+                  style={{
+                    padding: "8px 12px",
+                    fontSize: "14px",
+                    color: "#4b5563",
+                    textAlign: "center",
+                  }}
+                >
+                  Loading...
+                </div>
+              ) : error ? (
+                <div
+                  style={{
+                    padding: "8px 12px",
+                    fontSize: "14px",
+                    color: "#dc2626",
+                    textAlign: "center",
+                  }}
+                >
+                  Error: {error}
+                </div>
+              ) : (
+                <>
+                  <div
+                    style={{
+                      padding: "8px 12px",
+                      borderBottom: "1px solid #e5e7eb",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    <p
+                      style={{
+                        fontSize: "15px",
+                        fontWeight: "600",
+                        color: "#1f2937",
+                        marginBottom: "4px",
+                      }}
+                    >
+                      {userName}
+                    </p>
+                    <p
+                      style={{
+                        fontSize: "15px",
+                        color: "#4b5563",
+                        marginBottom: "4px",
+                      }}
+                    >
+                      {userEmail}
+                    </p>
+                    <p
+                      style={{
+                        fontSize: "15px",
+                        color: "#4b5563",
+                        textTransform: "capitalize",
+                      }}
+                    >
+                      Role: {userRole}
+                    </p>
+                  </div>
+                  {/* <div
+                    onClick={() => {
+                      setShowDropdown(false);
+                      navigate("/account");
+                    }}
+                    className="dropdown-item"
+                    style={{
+                      padding: "8px 12px",
+                      cursor: "pointer",
+                      fontSize: "14px",
+                      color: "#1f2937",
+                      transition: "background-color 0.2s",
+                    }}
+                  >
+                    Account Settings
+                  </div> */}
+                  <div
+                    onClick={handleLogout}
+                    className="logout-button"
+                    style={{
+                      padding: "8px 12px",
+                      cursor: "pointer",
+                      fontSize: "14px",
+                      color: "#ffffff",
+                      backgroundColor: "#ef4444",
+                      borderRadius: "4px",
+                      textAlign: "center",
+                      marginTop: "8px",
+                      transition: "background-color 0.2s",
+                    }}
+                  >
+                    Logout
+                  </div>
+                </>
+              )}
             </div>
           )}
         </div>
       </header>
-    );
-  }
+    </>
+  );
 }
