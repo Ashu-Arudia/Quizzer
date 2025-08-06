@@ -86,7 +86,9 @@ export default function StudentPage() {
       setLoadingTeachers(true);
       setError("");
       try {
-        const res = await fetch("http://localhost:8000/api/user/teachers");
+        const res = await fetch(
+          "https://quizzer-jqif.onrender.com/api/user/teachers"
+        );
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);
         }
@@ -112,12 +114,15 @@ export default function StudentPage() {
     setLoadingQuizzes(true);
     setQuizzes([]);
     try {
-      const res = await fetch(`http://localhost:8000/api/user/${teacher._id}`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(
+        `https://quizzer-jqif.onrender.com/api/user/${teacher._id}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
@@ -146,7 +151,7 @@ export default function StudentPage() {
     setPasswordError("");
     try {
       const res = await fetch(
-        `http://localhost:8000/api/quizzes/${selectedQuizForPassword._id}/verify-password`,
+        `https://quizzer-jqif.onrender.com/api/quizzes/${selectedQuizForPassword._id}/verify-password`,
         {
           method: "POST",
           headers: {

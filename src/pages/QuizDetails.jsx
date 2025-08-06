@@ -19,7 +19,7 @@ export default function QuizDetailsEditable() {
       try {
         const token = localStorage.getItem("token");
         const res = await fetch(
-          `http://localhost:8000/api/quizzes/${Id}/questions`,
+          `https://quizzer-jqif.onrender.com/api/quizzes/${Id}/questions`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -47,7 +47,7 @@ export default function QuizDetailsEditable() {
     try {
       const token = localStorage.getItem("token");
       const res = await fetch(
-        `http://localhost:8000/api/quizzes/question/${questionId}`,
+        `https://quizzer-jqif.onrender.com/api/quizzes/question/${questionId}`,
         {
           method: "DELETE",
           headers: {
@@ -67,7 +67,7 @@ export default function QuizDetailsEditable() {
     try {
       const token = localStorage.getItem("token");
       const res = await fetch(
-        `http://localhost:8000/api/quizzes/question/${questionId}`,
+        `https://quizzer-jqif.onrender.com/api/quizzes/question/${questionId}`,
         {
           method: "PUT",
           headers: {
@@ -190,9 +190,12 @@ function QuizDetailsEdit() {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://localhost:8000/api/quizzes/${Id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        `https://quizzer-jqif.onrender.com/api/quizzes/${Id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       const data = await res.json();
       setQuizData(data);
       setShowModal(true);
@@ -207,14 +210,17 @@ function QuizDetailsEdit() {
   const saveQuiz = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://localhost:8000/api/quizzes/${Id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(quizData),
-      });
+      const res = await fetch(
+        `https://quizzer-jqif.onrender.com/api/quizzes/${Id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(quizData),
+        }
+      );
       if (!res.ok) throw new Error("Update failed");
       setShowModal(false);
       window.location.reload();

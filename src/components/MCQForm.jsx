@@ -52,14 +52,17 @@ export default function MCQForm({ onMCQAdded }) {
     }
 
     try {
-      const response = await fetch("http://localhost:8000/api/mcq", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(mcq),
-      });
+      const response = await fetch(
+        "https://quizzer-jqif.onrender.com/api/mcq",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(mcq),
+        }
+      );
 
       const data = await response.json();
 

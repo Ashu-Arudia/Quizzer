@@ -31,12 +31,15 @@ export default function AdminPage0() {
 
   const fetchQuizzes = async (token) => {
     try {
-      const response = await fetch("http://localhost:8000/api/quizzes", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        "https://quizzer-jqif.onrender.com/api/quizzes",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch quizzes");
@@ -65,12 +68,15 @@ export default function AdminPage0() {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await fetch(`http://localhost:8000/api/quizzes/${quizId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(
+        `https://quizzer-jqif.onrender.com/api/quizzes/${quizId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!res.ok) throw new Error("Failed to delete quiz");
 

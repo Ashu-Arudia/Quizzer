@@ -2,9 +2,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import "./App.css";
 import Footer from "./components/footer";
-import ProtectedRoute from "./components/protectedroute";
 import SignupPage from "./components/SignupForm";
-import AdminPage from "./pages/AdminPage";
 import AdminPage0 from "./pages/AdminPage0";
 import Login from "./pages/Login";
 import LoginPage from "./pages/LoginPage";
@@ -22,14 +20,6 @@ function App() {
             <Routes>
               <Route path="/" element={<LoginPage />} />
               <Route path="/login" element={<Login />} />
-              <Route
-                path="/teacher/create-quiz"
-                element={
-                  <ProtectedRoute allowedRoles={["teacher"]}>
-                    <AdminPage />
-                  </ProtectedRoute>
-                }
-              />
               <Route
                 path="/signup"
                 element={

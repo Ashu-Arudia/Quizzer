@@ -12,7 +12,7 @@ export default function LoginForm() {
   const navigate = useNavigate();
 
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:8000/api/auth/google";
+    window.location.href = "https://quizzer-jqif.onrender.com/api/auth/google";
   };
 
   const { pathname } = useLocation();
@@ -26,7 +26,7 @@ export default function LoginForm() {
     setError("");
     setIsLoading(true);
 
-    const url = "http://localhost:8000/api/auth/login";
+    const url = "https://quizzer-jqif.onrender.com/api/auth/login";
     const payload = { username, password };
 
     try {

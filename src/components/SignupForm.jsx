@@ -24,7 +24,7 @@ export default function SignupForm() {
       setIsLoading(false);
       return;
     }
-    const url = "http://localhost:8000/api/auth/register";
+    const url = "https://quizzer-jqif.onrender.com/api/auth/register";
     const payload = { username, password, role, token };
 
     try {

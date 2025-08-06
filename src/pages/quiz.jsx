@@ -21,7 +21,7 @@ export default function TakeQuiz() {
     const fetchQuiz = async () => {
       try {
         const res = await fetch(
-          `http://localhost:8000/api/user/${quizId}/questions`,
+          `https://quizzer-jqif.onrender.com/api/user/${quizId}/questions`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

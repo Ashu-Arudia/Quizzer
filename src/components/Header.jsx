@@ -37,10 +37,13 @@ export default function Header() {
       }
 
       try {
-        const res = await fetch("http://localhost:8000/api/user/profile", {
-          method: "GET",
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch(
+          "https://quizzer-jqif.onrender.com/api/user/profile",
+          {
+            method: "GET",
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         if (!res.ok) throw new Error("Failed to fetch user data");
         const data = await res.json();
         setUserEmail(data.email || "N/A");

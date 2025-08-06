@@ -107,14 +107,17 @@ const QuizForm = () => {
         topics,
       };
 
-      const quizResponse = await fetch("http://localhost:8000/api/quizzes", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(quizData),
-      });
+      const quizResponse = await fetch(
+        "https://quizzer-jqif.onrender.com/api/quizzes",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(quizData),
+        }
+      );
 
       if (!quizResponse.ok) {
         throw new Error("Failed to create quiz.");
@@ -137,7 +140,7 @@ const QuizForm = () => {
       // Step 3: Send all questions to the backend using the new BULK route.
       // THIS IS THE CRUCIAL CHANGE: The URL now includes "/bulk"
       const questionResponse = await fetch(
-        "http://localhost:8000/api/quizzes/questions/bulk",
+        "https://quizzer-jqif.onrender.com/api/quizzes/questions/bulk",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
