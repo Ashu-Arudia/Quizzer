@@ -86,11 +86,9 @@ export default function TakeQuiz() {
 
     let correct = 0;
     questions.forEach((q) => {
-      // Convert correct indices to numbers to handle potential string indices from API
       const correctOptions = new Set((q.correct || []).map(Number));
       const selectedOptions = new Set(answers[q._id] || []);
 
-      // Debug log to inspect data
       console.log(
         `Question ID: ${q._id}, Correct: ${JSON.stringify([
           ...correctOptions,
@@ -220,7 +218,6 @@ export default function TakeQuiz() {
             padding: "2rem",
           }}
         >
-          {/* Quiz Info Section - Shown only when quiz hasn't started and score is null */}
           {!started && score === null && (
             <div
               style={{
@@ -265,7 +262,6 @@ export default function TakeQuiz() {
             </div>
           )}
 
-          {/* Start Button Section */}
           {!started && score === null && (
             <div style={{ textAlign: "center", marginTop: "2.5rem" }}>
               <button
@@ -287,7 +283,6 @@ export default function TakeQuiz() {
             </div>
           )}
 
-          {/* Quiz Questions Section */}
           {started && (
             <>
               <div
@@ -391,7 +386,6 @@ export default function TakeQuiz() {
                 </div>
               </div>
 
-              {/* Navigation and Submit Buttons */}
               <div
                 className="nav-buttons"
                 style={{
@@ -462,7 +456,6 @@ export default function TakeQuiz() {
             </>
           )}
 
-          {/* Score Display Section */}
           {score !== null && (
             <div
               style={{
