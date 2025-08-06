@@ -219,12 +219,12 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
+  background-color: #ffffff;
+  color: rgb(0, 0, 0);
 }
 
 .btn-secondary {
-  background: linear-gradient(135deg, #6c757d, #495057);
+  background: linear-gradient(135deg, #8c8c8c, #495057);
   color: white;
 }
 
@@ -571,7 +571,6 @@
   border-top: 1px solid #e5e7eb;
 }
 
-/* Fullscreen Results Interface */
 .results-fullscreen {
   position: fixed;
   top: 0;
@@ -778,7 +777,7 @@
 }
 
 .btn-start {
-  background-color: #3498db;
+  background-color: #222222;
   color: #fff;
   border: none;
   padding: 10px 20px;
@@ -790,10 +789,9 @@
 }
 
 .btn-start:hover {
-  background-color: #2980b9;
+  background-color: grey;
 }
 
-/* Updated loading and empty state messages */
 .loading {
   text-align: center;
   padding: 40px;
@@ -875,16 +873,6 @@
   border: none;
   border-radius: 5px;
   cursor: pointer;
-}
-
-.btn-primary {
-  background-color: #007bff;
-  color: white;
-}
-
-.btn-secondary {
-  background-color: #e0e0e0;
-  color: #333;
 }
 
 .error-message {

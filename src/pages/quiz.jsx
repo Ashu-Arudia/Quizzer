@@ -269,8 +269,8 @@ export default function TakeQuiz() {
                 className="start-button"
                 style={{
                   padding: "0.75rem 2rem",
-                  backgroundColor: "#4f46e5",
-                  color: "#ffffff",
+                  backgroundColor: "rgb(176, 235, 240)",
+                  color: "black",
                   fontWeight: "600",
                   borderRadius: "0.5rem",
                   border: "none",

@@ -5,8 +5,6 @@ import Password from "../icons/password.png";
 import Teacher from "../icons/teacher.png";
 import "./StudentPage.css";
 
-// Assuming you have a separate component for the modal
-// We'll define a basic one here for simplicity.
 function QuizPasswordModal({ isOpen, onClose, onPasswordSubmit, error }) {
   const [password, setPassword] = useState("");
   if (!isOpen) return null;
@@ -134,7 +132,6 @@ export default function StudentPage() {
     }
   };
 
-  // New function to handle quiz selection
   const handleQuizCardClick = (quiz) => {
     if (quiz.visibility === "Private") {
       setSelectedQuizForPassword(quiz);
@@ -145,7 +142,6 @@ export default function StudentPage() {
     }
   };
 
-  // New function to handle private quiz password submission
   const handleSubmitPassword = async (password) => {
     setPasswordError("");
     try {
@@ -210,8 +206,9 @@ export default function StudentPage() {
           {selectedTeacher ? (
             <div className="quiz-list-container">
               <div className="quiz-list-header">
-                <h1>Quizzes by {selectedTeacher.username}</h1>
-                <p>Select a quiz to start</p>
+                <h1 style={{ marginBottom: "20px" }}>
+                  Quizzes by {selectedTeacher.username}
+                </h1>
               </div>
               {loadingQuizzes ? (
                 <div className="loading">
@@ -260,12 +257,7 @@ export default function StudentPage() {
                           </p>
                         </div>
                       </div>
-                      <button className="btn-start">
-                        {quiz.visibility === "private"
-                          ? "Enter Password"
-                          : "Start Quiz"}{" "}
-                        →
-                      </button>
+                      <button className="btn-start">Start Quiz →</button>
                     </li>
                   ))}
                 </ul>
