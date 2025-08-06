@@ -15,6 +15,30 @@ router.post("/questions", async (req, res) => {
   }
 });
 
+router.post(
+  "/:Id/verify-password",
+  authenticateToken,
+  authorizeRoles("student"),
+  async (req, res) => {
+    try {
+      const quizId = req.params.Id;
+      const quiz = await Quiz.findById(quizId);
+      const { password } = req.body;
+
+      if (!quiz) {
+        res.status(404).json({ message: "quiz not found" });
+      }
+      if (quiz.password === password) {
+        res.status(200).json({ message: "Correct Password" });
+      } else {
+        return res.status(401).json({ message: "Incorrect password" });
+      }
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  }
+);
+
 router.put(
   "/question/:Id",
   authenticateToken,

@@ -23,6 +23,23 @@ router.get(
     try {
       const quizId = req.params.quizId;
       const quiz = await Quiz.findById(quizId);
+      console.log(quiz);
+      const questions = await Questions.find({ quiz: quizId });
+      res.json({ questions, quiz });
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  }
+);
+
+router.get(
+  "/:quizId/questions",
+  authenticateToken,
+  authorizeRoles("student"),
+  async (req, res) => {
+    try {
+      const quizId = req.params.quizId;
+      const quiz = await Quiz.findById(quizId);
       const questions = await Questions.find({ quiz: quizId });
       res.json({ title: quiz.name, questions });
     } catch (err) {
@@ -41,7 +58,7 @@ router.get(
 
       // Find all quizzes created by the teacher
       const quizzes = await Quiz.find({ createdBy: teacherId }).select(
-        "name level timeLimit topics"
+        "name level timeLimit topics visibility password"
       );
 
       if (!quizzes.length) {
@@ -62,6 +79,8 @@ router.get(
             level: quiz.level,
             timeLimit: quiz.timeLimit,
             topics: quiz.topics,
+            visibility: quiz.visibility,
+            password: quiz.password,
             questionCount: questionCount,
           };
         })

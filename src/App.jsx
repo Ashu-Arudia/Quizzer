@@ -8,6 +8,7 @@ import AdminPage from "./pages/AdminPage";
 import AdminPage0 from "./pages/AdminPage0";
 import Login from "./pages/Login";
 import LoginPage from "./pages/LoginPage";
+import QuizPage from "./pages/quiz";
 import QuizDetails from "./pages/QuizDetails";
 import Quizform from "./pages/QuizForm";
 import StudentPage from "./pages/StudentPage";
@@ -38,6 +39,7 @@ function App() {
                 }
               />
               <Route path="/teacher0" element={<AdminPage0 />} />
+              <Route path="/student/quiz/:quizId" element={<QuizPage />} />
               <Route path="/teacher/quiz/:Id" element={<QuizDetails />} />
               <Route path="/student" element={<StudentPage />} />
               <Route path="/teacher/quizform" element={<Quizform />} />
